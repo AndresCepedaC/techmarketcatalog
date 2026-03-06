@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useContext, createContext, useCallb
 import { createRoot } from 'react-dom/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
+import './index.css';
 
 // ═══════════════════════════════════════════
 //  ERROR BOUNDARY (DevOps Protection)
@@ -321,7 +322,7 @@ async function fetchGroqIA(userMessage, productsContext, activeProduct) {
       model: "llama3-8b-8192", 
       messages: [
         { role: "system", content: systemPrompt }, 
-        { role: "user", content: userMessage }
+        { role: "user", content: userMessage || "Hola" }
       ], 
       temperature: 0.6,
       max_tokens: 250
