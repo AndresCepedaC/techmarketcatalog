@@ -7,7 +7,7 @@
  * ╚══════════════════════════════════════════╝
  */
 
-export const mockProducts = [
+const mockProducts = [
     { id: "1", name: "Mouse Gamer Logitech G304 Lightspeed", price: 80000, category: "Periféricos", image: "/g304.jpg", isPromo: true, specs: { "Conectividad": "Inalámbrica Lightspeed", "Sensor": "Hero", "DPI": "12.000" } },
     { id: "2", name: "Webcam Logitech C920 HD Pro 1080p", price: 150000, category: "Periféricos", image: "/c920.jpg", isPromo: false, specs: { "Resolución": "1080p", "Micrófono": "Estéreo integrado" } },
     { id: "3", name: "Intercomunicador Q58 MAX para Casco", price: 85000, category: "Accesorios", image: "/q58.jpg", isPromo: true, specs: { "Conectividad": "Bluetooth", "Resistencia": "Agua y polvo", "Uso": "Múltiples dispositivos" } },
