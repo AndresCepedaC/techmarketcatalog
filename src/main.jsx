@@ -304,11 +304,27 @@ function ProductModal() {
 //  CHATBOT (Aura AI)
 // ═══════════════════════════════════════════
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || '';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const VALID_ROLES = new Set(['system', 'user', 'assistant']);
+const WHATSAPP_LINK = 'https://wa.me/573005054912';
+
+// Sanitize messages: only valid roles, no empty content, all strings, no error messages
+function sanitizeMessages(rawMessages) {
+  return rawMessages.filter(m => {
+    if (!m || !m.content) return false;
+    if (!VALID_ROLES.has(m.role)) return false;
+    const content = String(m.content).trim();
+    if (content === '') return false;
+    // Filter out error fallback messages that leaked into history
+    if (content.startsWith('__ERROR__')) return false;
+    return true;
+  }).map(m => ({ role: m.role, content: String(m.content) }));
+}
 
 async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProduct) {
   if (!GROQ_API_KEY) {
     console.warn("Aura Debug: No VITE_GROQ_API_KEY found.");
-    return "⚠️ **Modo Demo**: No hay API Key configurada.";
+    return { ok: false, text: "⚠️ Modo Demo: No hay API Key configurada." };
   }
   
   try {
@@ -317,35 +333,39 @@ async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProd
       id: p.id, name: p.name, price: p.price, category: p.category,
       specs: p.specs
     }));
-    const productsString = JSON.stringify(safeCatalog);
-    
-    // System prompt with stringified product data
-    const systemPrompt = "Eres 'Aura', la asesora experta y ultra-persuasiva de 'Tech Market'. " +
-      "Tu personalidad es servicial, brillante y directa. " +
-      "Catálogo actual disponible: " + productsString + " " +
-      "Protocolo: 1. Solo ofrece productos del catálogo. 2. Estilo: Breve y en negritas. " +
-      "Contexto: El cliente está viendo " + (activeProduct ? activeProduct.name : "la página principal") + ". " +
-      "Objetivo: Invitar a contactar por WhatsApp: https://wa.me/573005054912";
 
-    // Flat messages array — no nested arrays, no empty messages, strict roles
-    const messages = [
+    // System prompt — strict catalog-only instructions
+    const systemPrompt = "Eres un asistente de ventas experto de TechMarket llamado 'Aura'. " +
+      "Responde preguntas basándote ÚNICAMENTE en este catálogo de productos. " +
+      "Si te preguntan por un producto que no está aquí, di amablemente que no lo tenemos disponible, pero recomienda alternativas del catálogo. " +
+      "Estilo: sé breve, usa negritas para destacar nombres y precios. " +
+      "Contexto: El cliente está viendo " + (activeProduct ? activeProduct.name : "la página principal") + ". " +
+      "Para finalizar compras, invita a contactar por WhatsApp: " + WHATSAPP_LINK + ". " +
+      "Catálogo: " + JSON.stringify(safeCatalog);
+
+    // Build raw messages array
+    const rawMessages = [
       { role: "system", content: systemPrompt },
       ...chatHistory
-        .filter(m => m && m.t && String(m.t).trim() !== "")
+        .filter(m => m && m.r !== 'error')
         .map(m => ({ 
           role: m.r === 'user' ? 'user' : 'assistant', 
-          content: String(m.t) 
+          content: String(m.t || '') 
         })),
       { role: "user", content: String(userMessage) }
     ];
 
+    // Strict sanitization before sending
+    const messages = sanitizeMessages(rawMessages);
+
     const payload = { 
-      model: "llama3-8b-8192", 
+      model: GROQ_MODEL, 
       messages,
       temperature: 0.7,
       max_tokens: 512
     };
 
+    console.log("Aura Debug: Modelo:", GROQ_MODEL);
     console.log("Aura Debug: Enviando payload...", JSON.stringify(payload, null, 2));
 
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -358,24 +378,36 @@ async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProd
     });
 
     if (!res.ok) {
-      // Extract detailed error from Groq response body
       let errorDetail;
       try {
         errorDetail = await res.json();
       } catch {
-        errorDetail = { error: { message: `HTTP ${res.status} — no parseable body` } };
+        errorDetail = { error: { message: `HTTP ${res.status}` } };
       }
       console.error(`Groq API Error ${res.status}:`, JSON.stringify(errorDetail, null, 2));
-      const friendlyMsg = errorDetail?.error?.message || `Error ${res.status}`;
-      throw new Error(friendlyMsg);
+      throw new Error(errorDetail?.error?.message || `Error ${res.status}`);
     }
 
     const data = await res.json();
-    return data.choices?.[0]?.message?.content || "No pude generar una respuesta.";
+    const content = data.choices?.[0]?.message?.content;
+    return { ok: true, text: content || "No pude generar una respuesta." };
   } catch (error) { 
     console.error("Error crítico en fetchGroqIA:", error);
-    return `Lo siento, hubo un problema técnico. ¿Podemos hablar por WhatsApp? (${error.message})`; 
+    return { ok: false, text: "Lo siento, hubo un problema conectando con el asistente. ¿Podemos hablar por WhatsApp?" }; 
   }
+}
+
+// Error message bubble with WhatsApp button
+function ChatErrorBubble({ text }) {
+  return (
+    <div className="p-3 text-[13px] rounded-xl max-w-[85%] bg-dark-700 text-gray-300 space-y-2">
+      <p>{text}</p>
+      <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer"
+         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold rounded-lg transition-colors">
+        <Lucide.MessageCircle size={14} /> Chatear por WhatsApp
+      </a>
+    </div>
+  );
 }
 
 function Chatbot() {
@@ -392,15 +424,14 @@ function Chatbot() {
     if (!input.trim() || typing) return;
     const userTxt = input.trim();
     
-    // Add user message locally
     setMsgs(prev => [...prev, { r: 'user', t: userTxt }]);
     setInput('');
     setTyping(true);
     
-    // Pass CURRENT history (msgs) to fetchGroqIA
-    const botRes = await fetchGroqIA(userTxt, msgs, window.PRODUCTS || [], activeProduct);
+    const result = await fetchGroqIA(userTxt, msgs, window.PRODUCTS || [], activeProduct);
     
-    setMsgs(prev => [...prev, { r: 'bot', t: botRes }]);
+    // Mark error messages so they don't pollute history sent to Groq
+    setMsgs(prev => [...prev, { r: result.ok ? 'bot' : 'error', t: result.text }]);
     setTyping(false);
   };
 
@@ -421,7 +452,10 @@ function Chatbot() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {msgs.map((m, i) => (
                 <div key={i} className={`flex ${m.r === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`p-3 text-[13px] rounded-xl max-w-[85%] whitespace-pre-wrap ${m.r === 'user' ? 'bg-neon-cyan/20 text-white' : 'bg-dark-700 text-gray-300'}`}>{m.t}</div>
+                  {m.r === 'error' 
+                    ? <ChatErrorBubble text={m.t} />
+                    : <div className={`p-3 text-[13px] rounded-xl max-w-[85%] whitespace-pre-wrap ${m.r === 'user' ? 'bg-neon-cyan/20 text-white' : 'bg-dark-700 text-gray-300'}`}>{m.t}</div>
+                  }
                 </div>
               ))}
               {typing && (
