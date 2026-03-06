@@ -293,42 +293,40 @@ function ProductModal() {
 // ═══════════════════════════════════════════
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || '';
 
-async function fetchGroqIA(userMessage, productsContext, activeProduct) {
+async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProduct) {
   if (!GROQ_API_KEY) {
-    console.warn("Aura Debug: No VITE_GROQ_API_KEY found in environment.");
-    return "⚠️ **Modo Demo**: No hay API Key configurada. Por favor, añade VITE_GROQ_API_KEY en Vercel.";
+    console.warn("Aura Debug: No VITE_GROQ_API_KEY found.");
+    return "⚠️ **Modo Demo**: No hay API Key configurada.";
   }
   
   try {
-    const productsString = JSON.stringify(productsContext, null, 2);
-    console.log("Aura Debug: Contexto de productos cargado (" + productsContext?.length + " items)");
+    const productsString = JSON.stringify(productsContext);
+    
+    // Rule B: Strict string concatenation for system prompt
+    const systemPrompt = "Eres 'Aura', la asesora experta y ultra-persuasiva de 'Tech Market'. " +
+      "Tu personalidad es servicial, brillante y directa. " +
+      "Catálogo actual disponible: " + productsString + " " +
+      "Protocolo: 1. Solo ofrece productos del catálogo. 2. Estilo: Breve y en negritas. " +
+      "Contexto: El cliente está viendo " + (activeProduct ? activeProduct.name : "la página principal") + ". " +
+      "Objetivo: Invitar a contactar por WhatsApp: https://wa.me/573005054912";
 
-    const systemPrompt = `
-      Eres "Aura", la asesora experta y ultra-persuasiva de "Tech Market". 
-      Tu personalidad es servicial, brillante y directa. Hablas con confianza sobre el hardware más avanzado.
-      
-      Catálogo actual disponible:
-      ${productsString}
-      
-      Protocolo de respuesta:
-      1. Solo ofrece productos que estén en el catálogo. No inventes precios.
-      2. Si no hay stock exacto, recomienda lo más cercano con entusiasmo.
-      3. Estilo: Usa negritas para nombres y precios. Sé breve e impactante.
-      4. Contexto: El cliente está viendo: ${activeProduct ? `"${activeProduct.name}"` : 'la página principal'}.
-      5. Objetivo: Cerrar el trato e invitar al cliente a contactarnos por WhatsApp.
-    `;
+    // Rule A: Clean and Flat Messages array
+    const messages = [
+      { role: "system", content: systemPrompt },
+      ...chatHistory.map(m => ({ 
+        role: m.r === 'user' ? 'user' : 'assistant', 
+        content: String(m.t) 
+      })).filter(m => m.content.trim() !== ""),
+      { role: "user", content: String(userMessage) }
+    ];
 
+    // Rule C: Standard model and minimal parameters
     const payload = { 
       model: "llama3-8b-8192", 
-      messages: [
-        { role: "system", content: systemPrompt }, 
-        { role: "user", content: userMessage || "Hola" }
-      ], 
-      temperature: 0.6,
-      max_tokens: 250
+      messages: messages
     };
 
-    console.log("Aura Debug: Enviando petición a Groq...", { model: payload.model });
+    console.log("Aura Debug: Enviando payload...", payload);
 
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -340,15 +338,16 @@ async function fetchGroqIA(userMessage, productsContext, activeProduct) {
     });
 
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      console.error("Error exacto de Groq (HTTP " + res.status + "):", errorData);
-      throw new Error(`Groq API returned ${res.status}`);
+      // Step 1: Detailed Error Extraction
+      const errorDetail = await res.json().catch(() => ({ error: "Unknown payload error" }));
+      console.error("Detalle del Error de Groq:", errorDetail);
+      throw new Error(`Groq API Error ${res.status}`);
     }
 
     const data = await res.json();
     return data.choices[0].message.content;
   } catch (error) { 
-    console.error("Error exacto de Groq:", error);
+    console.error("Error crítico en fetchGroqIA:", error);
     return "Lo siento, hubo un problema con mi sistema. ¿Podemos hablar por WhatsApp?"; 
   }
 }
@@ -365,12 +364,17 @@ function Chatbot() {
 
   const handleSend = async () => {
     if (!input.trim() || typing) return;
-    const txt = input.trim();
-    setMsgs(p => [...p, { r: 'user', t: txt }]);
+    const userTxt = input.trim();
+    
+    // Add user message locally
+    setMsgs(prev => [...prev, { r: 'user', t: userTxt }]);
     setInput('');
     setTyping(true);
-    const res = await fetchGroqIA(txt, window.PRODUCTS || [], activeProduct);
-    setMsgs(p => [...p, { r: 'bot', t: res }]);
+    
+    // Pass CURRENT history (msgs) to fetchGroqIA
+    const botRes = await fetchGroqIA(userTxt, msgs, window.PRODUCTS || [], activeProduct);
+    
+    setMsgs(prev => [...prev, { r: 'bot', t: botRes }]);
     setTyping(false);
   };
 
