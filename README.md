@@ -1,76 +1,66 @@
-# TechVault — Catálogo de Tecnología
+# Tech Market — E-Commerce Premium de Tecnología
 
-Catálogo estático de productos tech con diseño moderno (modo oscuro + acentos neón). Sin dependencias: solo HTML, CSS y JavaScript.
+Frontend modular de e-commerce con tema oscuro premium, React 18, y componentes listos para conectar con un backend Spring Boot.
 
-## 📁 Estructura del Proyecto
+## 📁 Estructura
 
 ```
-Marca/
-├── index.html              ← Página principal
-├── css/
-│   └── styles.css          ← Estilos (tema oscuro neón)
-├── js/
-│   └── app.js              ← Lógica: carga JSON, búsqueda en tiempo real
+techmarket/
+├── index.html            ← Entrada + todos los componentes React
 ├── data/
-│   └── productos.json      ← ⭐ Archivo de datos (editar aquí)
+│   └── products.js       ← ⭐ Datos de productos (editar aquí)
 └── README.md
 ```
 
-## ✏️ Cómo editar productos
+## ✏️ Editar Productos
 
-Abre `data/productos.json` en IntelliJ IDEA (o cualquier editor) y modifica el array. Cada producto tiene esta estructura:
+Abre `data/products.js` y modifica el array `window.PRODUCTS`. Cada producto:
 
-```json
+```js
 {
-  "id": 4,
-  "foto": "https://ejemplo.com/imagen.jpg",
-  "titulo": "Nombre del producto",
-  "descripcion": "Detalles técnicos del producto.",
-  "colores": ["Color 1", "Color 2"],
-  "precio": 499
+  id: 5,
+  name: "Nombre del producto",
+  price: 299.99,
+  category: "Categoría",
+  mainImage: "https://url-imagen-principal.jpg",
+  gallery: ["url1.jpg", "url2.jpg", "url3.jpg"],
+  shortDesc: "Descripción corta del producto.",
+  specs: { "RAM": "16 GB", "Procesador": "Ryzen 9" }
 }
 ```
 
-Guarda el archivo y recarga la página. ¡Eso es todo!
+## 🖥️ Ejecución Local
 
-## 🖥️ Ejecución local
-
-Al ser un sitio estático, necesitas un servidor local (no abrir el HTML directamente como archivo). Opciones rápidas:
+Necesitas un servidor local (no abrir como archivo por la carga del JSON):
 
 ```bash
-# Opción 1 – Python (suele estar instalado)
+# VS Code → extensión "Live Server" → clic derecho index.html → Open with Live Server
+# O con Python:
 python -m http.server 3000
-
-# Opción 2 – Node.js (si lo tienes)
+# O con Node.js:
 npx -y serve .
-
-# Opción 3 – VS Code
-# Instala la extensión "Live Server" y haz clic derecho → Open with Live Server
 ```
 
-Luego abre `http://localhost:3000` en tu navegador.
+## 🔌 Migración a Vite + Spring Boot
 
-## 🚀 Despliegue gratuito
+Cuando tengas Node.js instalado:
+
+1. `npm create vite@latest . -- --template react`
+2. `npm install tailwindcss framer-motion lucide-react`
+3. Extrae cada sección marcada con `═══` del HTML a su propio archivo `.jsx`
+4. Reemplaza los SVG icons inline con `import { Icon } from 'lucide-react'`
+5. Reemplaza las CSS animations con `<motion.div>` de Framer Motion
+6. Conecta `fetch()` en lugar de `window.PRODUCTS` para llamar a tu API REST
+
+## 🚀 Despliegue Gratuito
 
 ### Vercel
-
-1. Instala Vercel CLI: `npm i -g vercel`
-2. En la carpeta del proyecto ejecuta: `vercel`
-3. Sigue las instrucciones. Tu sitio estará en vivo en segundos.
+```bash
+npm i -g vercel && vercel
+```
 
 ### GitHub Pages
-
-1. Sube el proyecto a un repositorio en GitHub.
-2. Ve a **Settings → Pages → Branch → `main`** (carpeta `/root`).
-3. GitHub publicará el sitio automáticamente.
+Sube al repo → Settings → Pages → Branch `main` → carpeta `/root`
 
 ### Render
-
-1. Crea una cuenta en [render.com](https://render.com).
-2. Nuevo → **Static Site** → conecta tu repositorio.
-3. **Publish Directory**: `.` (raíz).
-4. Click en **Create Static Site**.
-
-## 📝 Licencia
-
-Proyecto con fines demostrativos. Libre de usar y modificar.
+Nuevo → Static Site → Publish Directory: `.` → Create

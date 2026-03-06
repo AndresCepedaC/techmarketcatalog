@@ -1,73 +1,846 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tech Market — Premium E-Commerce V2</title>
+  <meta name="theme-color" content="#0B0D17" />
 
-  <!-- SEO -->
-  <title>TechVault — Catálogo de Tecnología</title>
-  <meta name="description" content="Explora los mejores productos de tecnología: laptops, smartphones, periféricos y más. Catálogo en línea con las últimas novedades tech." />
-  <meta name="theme-color" content="#0a0a0f" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="TechVault — Catálogo de Tecnología" />
-  <meta property="og:description" content="Descubre lo último en tecnología. Laptops, smartphones y accesorios premium." />
-  <meta property="og:type" content="website" />
+  <!-- Tailwind CSS Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: { 900: '#0B0D17', 800: '#111427', 700: '#161A2E', 600: '#1C2039', 500: '#242844' },
+            neon: { cyan: '#00E5FF', purple: '#B026FF', pink: '#FF2D95' }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          animation: {
+            'glow': 'glow 2s ease-in-out infinite alternate',
+            'skeleton': 'skeleton 1.5s ease-in-out infinite'
+          },
+          keyframes: {
+            glow: { '0%': { boxShadow: '0 0 20px #00E5FF40' }, '100%': { boxShadow: '0 0 40px #00E5FF60, 0 0 60px #B026FF30' } },
+            skeleton: { '0%, 100%': { opacity: 0.3 }, '50%': { opacity: 0.1 } }
+          }
+        }
+      }
+    }
+  </script>
 
-  <!-- Favicon (inline SVG) -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="css/styles.css" />
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0B0D17;
+      color: #f0f0f5;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0B0D17;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #242844;
+      border-radius: 99px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00E5FF40;
+    }
+
+    .magnifier-container {
+      cursor: crosshair;
+    }
+
+    .neon-btn {
+      background: linear-gradient(135deg, #00E5FF, #B026FF);
+      transition: all 0.3s ease;
+    }
+
+    .neon-btn:hover {
+      box-shadow: 0 0 25px #00E5FF50, 0 0 45px #B026FF30;
+      transform: scale(1.02);
+    }
+
+    .glass {
+      background: rgba(11, 13, 23, 0.85);
+      backdrop-filter: blur(24px) saturate(200%);
+      -webkit-backdrop-filter: blur(24px) saturate(200%);
+    }
+
+    .chat-msg-bot {
+      background: linear-gradient(135deg, #111427, #1C2039);
+    }
+
+    .chat-msg-user {
+      background: linear-gradient(135deg, #00E5FF10, #B026FF10);
+      border: 1px solid #00E5FF30;
+    }
+  </style>
+
+  <!-- Import maps for React, Framer Motion, and Lucide without npm -->
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "framer-motion": "https://esm.sh/framer-motion@10.16.4?deps=react@18.2.0,react-dom@18.2.0",
+        "lucide-react": "https://esm.sh/lucide-react@0.292.0?deps=react@18.2.0"
+      }
+    }
+  </script>
 </head>
+
 <body>
+  <div id="root"></div>
 
-  <!-- ====== NAVBAR ====== -->
-  <nav class="navbar" id="navbar">
-    <a href="#" class="navbar__brand">
-      <span class="navbar__brand-icon">⚡</span>
-      TechVault
-    </a>
-    <span class="navbar__tagline">Catálogo de Tecnología</span>
-  </nav>
+  <!-- Product Data -->
+  <script src="data/products.js"></script>
 
-  <!-- ====== HERO ====== -->
-  <header class="hero">
-    <span class="hero__badge">✦ Catálogo 2026</span>
-    <h1 class="hero__title">Descubre lo último en <span>Tecnología</span></h1>
-    <p class="hero__subtitle">
-      Explora nuestra selección curada de productos tech: desde laptops ultraligeras hasta periféricos de élite.
-    </p>
-  </header>
+  <!-- Babel Standalone (JSX compilation) -->
+  <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
 
-  <!-- ====== SEARCH ====== -->
-  <div class="search-wrapper">
-    <div class="search">
-      <span class="search__icon">🔍</span>
-      <input
-        type="text"
-        id="search-input"
-        class="search__input"
-        placeholder="Buscar productos por nombre..."
-        autocomplete="off"
-      />
-    </div>
-    <p id="product-count" class="search__count"></p>
-  </div>
+  <!-- Main App Logic -->
+  <script type="text/babel" data-type="module">
+    import React, { useState, useEffect, useRef, useContext, createContext, useCallback, useMemo } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import { motion, AnimatePresence } from 'framer-motion';
+    import * as Lucide from 'lucide-react';
 
-  <!-- ====== CATALOG GRID ====== -->
-  <main class="catalog">
-    <div class="product-grid" id="product-grid">
-      <!-- Cards injected by JS -->
-    </div>
-  </main>
+    // ═══════════════════════════════════════════
+    //  GLOBAL STATE (Context API & Custom Hooks)
+    // ═══════════════════════════════════════════
+    const StoreContext = createContext();
 
-  <!-- ====== FOOTER ====== -->
-  <footer class="footer">
-    <p>&copy; 2026 TechVault. Todos los derechos reservados. Catálogo con fines demostrativos.</p>
-  </footer>
+    function StoreProvider({ children }) {
+      const [cart, setCart] = useState([]);
+      const [isCartOpen, setIsCartOpen] = useState(false);
+      const [activeProduct, setActiveProduct] = useState(null);
+      const [searchQuery, setSearchQuery] = useState("");
+      const [selectedCategory, setSelectedCategory] = useState("Todos");
 
-  <!-- App Script -->
-  <script src="js/app.js"></script>
+      // useCart Logic
+      const addToCart = useCallback((product) => {
+        setCart(prev => {
+          const existing = prev.find(item => item.product.id === product.id);
+          if (existing) return prev.map(item => item.product.id === product.id ? { ...item, qty: item.qty + 1 } : item);
+          return [...prev, { product, qty: 1 }];
+        });
+        setIsCartOpen(true);
+      }, []);
+
+      const updateQuantity = useCallback((id, change) => {
+        setCart(prev => prev.map(item => {
+          if (item.product.id === id) {
+            const newQty = item.qty + change;
+            return newQty > 0 ? { ...item, qty: newQty } : item;
+          }
+          return item;
+        }));
+      }, []);
+
+      const removeFromCart = useCallback((id) => {
+        setCart(prev => prev.filter(item => item.product.id !== id));
+      }, []);
+
+      const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
+      const cartSubtotal = cart.reduce((sum, item) => sum + (item.product.price * item.qty), 0);
+
+      const value = useMemo(() => ({
+        cart, addToCart, updateQuantity, removeFromCart, cartCount, cartSubtotal,
+        isCartOpen, setIsCartOpen,
+        activeProduct, setActiveProduct,
+        searchQuery, setSearchQuery,
+        selectedCategory, setSelectedCategory
+      }), [cart, cartCount, cartSubtotal, isCartOpen, activeProduct, searchQuery, selectedCategory, addToCart, updateQuantity, removeFromCart]);
+
+      return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+    }
+
+    function useStore() { return useContext(StoreContext); }
+
+
+    // ═══════════════════════════════════════════
+    //  TOP BAR
+    // ═══════════════════════════════════════════
+    function TopBar() {
+      return (
+        <div className="bg-dark-800 border-b border-white/5 h-8 flex items-center justify-between px-4 md:px-6 text-[11px] text-gray-500 font-medium tracking-wide">
+          <div className="flex items-center gap-5">
+            <a href="mailto:info@techmarket.com" className="flex items-center gap-1.5 hover:text-neon-cyan transition-colors">
+              <Lucide.Mail size={12} /> info@techmarket.com
+            </a>
+            <a href="https://wa.me/573000000000" target="_blank" className="flex items-center gap-1.5 hover:text-neon-cyan transition-colors">
+              <Lucide.Phone size={12} /> +57 300 000 0000
+            </a>
+          </div>
+          <div className="flex items-center gap-4">
+            <a href="#" className="hover:text-neon-cyan transition-colors"><Lucide.Github size={14} /></a>
+            <a href="#" className="hover:text-neon-cyan transition-colors"><Lucide.Linkedin size={14} /></a>
+          </div>
+        </div>
+      );
+    }
+
+
+    // ═══════════════════════════════════════════
+    //  HEADER (Glassmorphism + Logo)
+    // ═══════════════════════════════════════════
+    function Header() {
+      const { searchQuery, setSearchQuery, cartCount, setIsCartOpen } = useStore();
+      const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+      return (
+        <header className="sticky top-0 z-40 glass border-b border-white/[0.04]">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between gap-4">
+
+            {/* Logo & Mobile Menu Toggle */}
+            <div className="flex items-center gap-2">
+              <button className="md:hidden p-2 text-gray-400 hover:text-neon-cyan" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                <Lucide.Menu size={24} />
+              </button>
+
+              <div className="flex items-center cursor-pointer">
+                {/* The attached logo image */}
+                <img
+                  src="./logo-tech-market.png"
+                  alt="Tech Market Logo"
+                  className="h-10 md:h-14 w-auto object-contain hover:drop-shadow-[0_0_8px_#00E5FF] transition-all duration-300"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    // Fallback text if logo image is missing
+                    e.target.outerHTML = `<span class="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2 hover:drop-shadow-[0_0_8px_#00E5FF] transition-all text-white"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> TECHMARKET</span>`;
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Search Bar (Desktop) */}
+            <div className="hidden md:block flex-1 max-w-lg mx-6">
+              <div className="relative group">
+                <Lucide.Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-neon-cyan transition-colors" />
+                <input
+                  type="text" placeholder="Geforce RTX, MacBook, Audífonos..." value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 bg-dark-700/60 border border-white/[0.06] rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-neon-cyan/40 focus:bg-dark-700 focus:shadow-[0_0_15px_#00E5FF15] transition-all duration-300"
+                />
+              </div>
+            </div>
+
+            {/* Right Actions */}
+            <div className="flex items-center gap-1 md:gap-3">
+              <button className="p-2.5 text-gray-400 hover:text-neon-cyan transition-colors rounded-xl hover:bg-white/5 relative group" onClick={() => setIsCartOpen(true)}>
+                <Lucide.ShoppingCart size={22} className="group-hover:scale-110 transition-transform" />
+                {cartCount > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }} animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 bg-neon-cyan text-dark-900 text-[11px] font-extrabold rounded-full flex items-center justify-center shadow-[0_0_10px_#00E5FF]"
+                  >
+                    {cartCount}
+                  </motion.span>
+                )}
+              </button>
+              <button className="hidden sm:block p-2.5 text-gray-400 hover:text-neon-cyan transition-colors rounded-xl hover:bg-white/5">
+                <Lucide.User size={22} />
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Search Bar (Collapsible) */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="md:hidden overflow-hidden border-t border-white/5 bg-dark-800"
+              >
+                <div className="p-4">
+                  <div className="relative">
+                    <Lucide.Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                    <input
+                      type="text" placeholder="Buscar productos..." value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 bg-dark-700 border border-white/[0.06] rounded-lg text-sm text-white focus:outline-none focus:border-neon-cyan/40"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </header>
+      );
+    }
+
+
+    // ═══════════════════════════════════════════
+    //  CATEGORY FILTERS
+    // ═══════════════════════════════════════════
+    function CategoryFilters() {
+      const { selectedCategory, setSelectedCategory } = useStore();
+      const cats = ["Todos", "Periféricos", "Accesorios", "Audio", "Smart Home", "Software"];
+
+      return (
+        <div className="flex overflow-x-auto gap-3 pb-4 mb-6 scrollbar-hide">
+          {cats.map(cat => {
+            const active = selectedCategory === cat;
+            return (
+              <button
+                key={cat} onClick={() => setSelectedCategory(cat)}
+                className={`whitespace-nowrap px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-300 border ${active
+                  ? 'bg-neon-cyan/10 text-neon-cyan border-neon-cyan shadow-[0_0_10px_#00E5FF20]'
+                  : 'bg-dark-800 text-gray-400 border-white/[0.06] hover:bg-dark-700 hover:text-white hover:border-white/20'
+                  }`}
+              >
+                {cat}
+              </button>
+            );
+          })}
+        </div>
+      );
+    }
+
+
+    // ═══════════════════════════════════════════
+    //  PRODUCT GRID & CARDS
+    // ═══════════════════════════════════════════
+    const containerVariants = {
+      hidden: { opacity: 0 },
+      show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+    };
+
+    const itemVariants = {
+      hidden: { opacity: 0, y: 30 },
+      show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+    };
+
+    function ProductCard({ product }) {
+      const { setActiveProduct } = useStore();
+
+      return (
+        <motion.div variants={itemVariants} className="group relative bg-dark-800/60 border border-white/[0.04] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_0_15px_#00E5FF40] hover:border-neon-cyan/30" onClick={() => setActiveProduct(product)}>
+
+          {/* Glow corner accent */}
+          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-neon-purple/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+          {/* Promo Badge */}
+          {product.isPromo && (
+            <div className="absolute top-3 right-3 z-10 bg-gradient-to-r from-neon-pink to-neon-purple px-3 py-1 text-[10px] uppercase font-black tracking-widest text-white rounded-full shadow-[0_0_15px_#FF2D9560]">
+              Oferta Neón
+            </div>
+          )}
+
+          <div className="relative h-52 bg-dark-900 overflow-hidden p-6 flex items-center justify-center">
+            {/* Using mock fallback images via unpkg or placehold for now, mapping original user image paths conceptually */}
+            <motion.img
+              src={`https://placehold.co/300x300/1C2039/00E5FF?text=${encodeURIComponent(product.name)}`} alt={product.name}
+              className="w-full h-full object-contain"
+              whileHover={{ scale: 1.1 }} transition={{ duration: 0.4 }}
+            />
+            <div className="absolute top-3 left-3 bg-dark-700/80 backdrop-blur-md px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider text-neon-cyan border border-neon-cyan/20 rounded-lg">
+              {product.category}
+            </div>
+          </div>
+
+          <div className="p-5">
+            <h3 className="font-semibold text-sm text-gray-100 mb-1 line-clamp-2 group-hover:text-neon-cyan transition-colors" title={product.name}>{product.name}</h3>
+            <p className="text-[11px] text-gray-500 mb-4 line-clamp-2 leading-relaxed">
+              {Object.values(product.specs).join(" • ")}
+            </p>
+            <div className="flex items-center justify-between mt-auto">
+              <span className="text-xl font-bold text-white tracking-tight">${product.price.toLocaleString('en-US', { minimumFractionDigits: 0 })}</span>
+              <div className="w-9 h-9 rounded-xl bg-dark-700 border border-white/10 flex items-center justify-center text-gray-400 group-hover:bg-neon-cyan group-hover:text-dark-900 group-hover:border-neon-cyan transition-all duration-300 shadow-sm">
+                <Lucide.Plus size={18} />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      );
+    }
+
+    function ProductGrid() {
+      const { searchQuery, selectedCategory } = useStore();
+      const [loading, setLoading] = useState(true);
+
+      // Simulate 1.5s Skeleton Loader delay
+      useEffect(() => {
+        const timer = setTimeout(() => setLoading(false), 1500);
+        return () => clearTimeout(timer);
+      }, []);
+
+      const filtered = useMemo(() => {
+        let list = window.PRODUCTS;
+        if (selectedCategory !== "Todos") list = list.filter(p => p.category === selectedCategory);
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase();
+          list = list.filter(p => p.name.toLowerCase().includes(q) || Object.values(p.specs).some(val => val.toLowerCase().includes(q)));
+        }
+        return list;
+      }, [searchQuery, selectedCategory]);
+
+      return (
+        <section className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+          <CategoryFilters />
+
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-dark-800/50 border border-white/[0.04] rounded-2xl overflow-hidden h-[360px] animate-skeleton">
+                  <div className="h-52 bg-dark-700/50" />
+                  <div className="p-5 space-y-3">
+                    <div className="h-4 bg-dark-600/60 rounded w-3/4" />
+                    <div className="h-3 bg-dark-600/60 rounded w-full" />
+                    <div className="h-3 bg-dark-600/60 rounded w-5/6" />
+                    <div className="h-8 bg-dark-600/60 rounded w-1/3 mt-4" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filtered.length > 0 ? (
+                filtered.map(product => <ProductCard key={product.id} product={product} />)
+              ) : (
+                <div className="col-span-full py-24 flex flex-col items-center justify-center text-gray-500">
+                  <Lucide.PackageX size={48} className="mb-4 text-dark-600" />
+                  <p>No se encontraron productos en esta categoría.</p>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </section>
+      );
+    }
+
+
+    // ═══════════════════════════════════════════
+    //  HIGH-CONVERSION QUICK VIEW MODAL
+    // ═══════════════════════════════════════════
+    function ImageMagnifier({ src }) {
+      const [zoom, setZoom] = useState({ show: false, x: 0, y: 0 });
+
+      const handleMove = (e) => {
+        const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - left) / width) * 100;
+        const y = ((e.clientY - top) / height) * 100;
+        setZoom({ show: true, x, y });
+      };
+
+      return (
+        <div className="relative w-full h-full bg-dark-900 rounded-xl overflow-hidden magnifier-container flex items-center justify-center p-4 border border-white/5"
+          onMouseMove={handleMove} onMouseLeave={() => setZoom({ ...zoom, show: false })}>
+          <img src={src} className={`w-full h-full object-contain transition-opacity duration-200 ${zoom.show ? 'opacity-0' : 'opacity-100'}`} />
+
+          {zoom.show && (
+            <div className="absolute inset-0 z-10 pointer-events-none"
+              style={{
+                backgroundImage: `url(${src})`, backgroundPosition: `${zoom.x}% ${zoom.y}%`, backgroundSize: '250%',
+              }} />
+          )}
+          {!zoom.show && (
+            <div className="absolute bottom-3 right-3 bg-dark-800/80 px-2 py-1 rounded text-[10px] text-gray-400 border border-white/10 flex items-center gap-1">
+              <Lucide.ZoomIn size={12} /> Hover para zoom
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function ProductModal() {
+      const { activeProduct, setActiveProduct, addToCart, setIsCartOpen } = useStore();
+      const [idx, setIdx] = useState(0);
+
+      // Reset index when product changes
+      useEffect(() => { setIdx(0); }, [activeProduct]);
+
+      return (
+        <AnimatePresence>
+          {activeProduct && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                onClick={() => setActiveProduct(null)}
+              />
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="relative w-full max-w-5xl max-h-[90vh] bg-dark-800 border border-white/10 shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row z-10"
+              >
+                <button onClick={() => setActiveProduct(null)} className="absolute top-4 right-4 z-20 p-2 bg-dark-700 hover:bg-neon-cyan/20 hover:text-neon-cyan rounded-full transition-colors border border-white/10">
+                  <Lucide.X size={18} />
+                </button>
+
+                {/* Gallery Side */}
+                <div className="w-full md:w-1/2 p-5 bg-dark-900/50 flex flex-col gap-4">
+                  <div className="flex-1 min-h-[250px] md:min-h-[400px]">
+                    <ImageMagnifier src={`https://placehold.co/600x600/1C2039/00E5FF?text=${encodeURIComponent(activeProduct.name)}`} />
+                  </div>
+                </div>
+
+                {/* Info Side */}
+                <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col overflow-y-auto">
+                  <span className="text-[10px] uppercase tracking-widest text-neon-purple font-bold mb-2">{activeProduct.category}</span>
+                  <h2 className="text-2xl md:text-3xl font-black mb-3 leading-tight flex items-center gap-3">
+                    {activeProduct.name}
+                    {activeProduct.isPromo && <span className="bg-neon-pink text-[10px] px-2 py-1 rounded-md tracking-wider">PROMO</span>}
+                  </h2>
+                  <div className="text-3xl font-bold bg-gradient-to-r from-neon-cyan to-neon-purple bg-clip-text text-transparent mb-6">
+                    ${activeProduct.price.toLocaleString('en-US', { minimumFractionDigits: 0 })}
+                  </div>
+
+                  {/* Specs Grid */}
+                  <div className="mb-8 bg-dark-700/30 border border-white/5 rounded-xl overflow-hidden">
+                    <div className="bg-dark-700 px-4 py-2 border-b border-white/5 text-xs font-semibold text-gray-400">Especificaciones Técnicas</div>
+                    <div className="grid grid-cols-1 text-sm">
+                      {Object.entries(activeProduct.specs).map(([key, value], i) => (
+                        <div key={key} className={`flex justify-between px-4 py-2.5 ${i % 2 === 0 ? 'bg-white/[0.02]' : ''}`}>
+                          <span className="text-gray-500">{key}</span>
+                          <span className="font-medium text-right ml-4 text-white">{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="mt-auto flex flex-col gap-3">
+                    <button
+                      onClick={() => { addToCart(activeProduct); setActiveProduct(null); }}
+                      className="w-full neon-btn py-4 rounded-xl font-bold text-dark-900 text-sm flex items-center justify-center gap-2 shadow-lg"
+                    >
+                      <Lucide.ShoppingCart size={18} /> Añadir al Carrito
+                    </button>
+                    <div className="flex items-center justify-center gap-4 text-[11px] text-gray-500 mt-2">
+                      <span className="flex items-center gap-1"><Lucide.Truck size={14} className="text-neon-cyan/70" /> Envío Inmediato</span>
+                      <span className="flex items-center gap-1"><Lucide.ShieldCheck size={14} className="text-neon-cyan/70" /> Garantía Oficial</span>
+                    </div>
+                  </div>
+                </div>
+
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+      );
+    }
+
+
+    // ═══════════════════════════════════════════
+    //  SLIDE-OVER CART & WHATSAPP CHECKOUT
+    // ═══════════════════════════════════════════
+    function SlideOverCart() {
+      const { cart, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, cartSubtotal } = useStore();
+
+      const handleWhatsAppCheckout = () => {
+        if (cart.length === 0) return;
+
+        // Build WhatsApp message dynamically
+        let text = "👋 *Hola Tech Market!* Quiero realizar el siguiente pedido:\n\n";
+        cart.forEach((item, i) => {
+          text += `${i + 1}. ${item.product.name} (x${item.qty}) - $${(item.product.price * item.qty).toLocaleString('en-US')}\n`;
+        });
+        text += `\n*Subtotal:* $${cartSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}\n\n`;
+        text += "¿Me pueden confirmar disponibilidad y métodos de pago?";
+
+        const url = `https://wa.me/573000000000?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+      };
+
+      return (
+        <AnimatePresence>
+          {isCartOpen && (
+            <React.Fragment>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+                onClick={() => setIsCartOpen(false)}
+              />
+
+              {/* Panel */}
+              <motion.div
+                initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="fixed top-0 right-0 bottom-0 w-full md:w-[420px] bg-dark-800 border-l border-white/5 z-[101] shadow-2xl flex flex-col"
+              >
+                {/* Cart Header */}
+                <div className="flex items-center justify-between p-5 md:p-6 border-b border-white/5 bg-dark-900/50">
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <Lucide.ShoppingBag className="text-neon-cyan" size={20} /> Tu Carrito
+                  </h2>
+                  <button onClick={() => setIsCartOpen(false)} className="p-2 hover:bg-white/5 rounded-full text-gray-400 hover:text-white transition-colors">
+                    <Lucide.X size={20} />
+                  </button>
+                </div>
+
+                {/* Cart Items */}
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+                  {cart.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-4">
+                      <div className="w-20 h-20 rounded-full bg-dark-700 border border-white/5 flex items-center justify-center">
+                        <Lucide.ShoppingCart size={32} className="opacity-50" />
+                      </div>
+                      <p>Tu carrito está vacío.</p>
+                      <button onClick={() => setIsCartOpen(false)} className="text-sm text-neon-cyan hover:underline">Ir de compras</button>
+                    </div>
+                  ) : (
+                    cart.map(item => (
+                      <motion.div layout key={item.product.id} className="flex gap-4 p-3 bg-dark-700/40 border border-white/5 rounded-xl group relative">
+                        <img src={`https://placehold.co/150x150/1C2039/00E5FF?text=${encodeURIComponent(item.product.name.substring(0, 6))}`} className="w-16 h-16 object-contain bg-dark-900 rounded-lg border border-white/5 p-1" />
+                        <div className="flex-1">
+                          <h4 className="text-[13px] font-semibold text-white line-clamp-2 leading-tight pr-6">{item.product.name}</h4>
+                          <div className="text-neon-cyan font-bold mt-1 text-sm">${item.product.price.toLocaleString('en-US')}</div>
+
+                          {/* Quantity Controls */}
+                          <div className="flex items-center gap-3 mt-2">
+                            <div className="flex items-center bg-dark-900 rounded-md border border-white/5">
+                              <button onClick={() => updateQuantity(item.product.id, -1)} className="px-2 py-1 text-gray-400 hover:text-white"><Lucide.Minus size={12} /></button>
+                              <span className="text-xs font-semibold w-6 text-center">{item.qty}</span>
+                              <button onClick={() => updateQuantity(item.product.id, 1)} className="px-2 py-1 text-gray-400 hover:text-white"><Lucide.Plus size={12} /></button>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Delete item */}
+                        <button onClick={() => removeFromCart(item.product.id)} className="absolute top-2 right-2 p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-400/10 rounded-md transition-colors">
+                          <Lucide.Trash2 size={14} />
+                        </button>
+                      </motion.div>
+                    ))
+                  )}
+                </div>
+
+                {/* Cart Footer */}
+                {cart.length > 0 && (
+                  <div className="p-5 md:p-6 border-t border-white/5 bg-dark-900/80 backdrop-blur-md">
+                    <div className="flex justify-between items-center mb-6">
+                      <span className="text-gray-400">Subtotal</span>
+                      <span className="text-2xl font-black">${cartSubtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                    </div>
+
+                    <button onClick={handleWhatsAppCheckout} className="w-full relative group overflow-hidden rounded-xl font-bold text-white shadow-lg transition-transform hover:scale-[1.02]">
+                      {/* WhatsApp Brand Color Gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-[#25D366] to-[#128C7E]" />
+                      <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+
+                      <div className="relative flex items-center justify-center gap-2 py-4">
+                        <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                        </svg>
+                        Comprar por WhatsApp
+                      </div>
+                    </button>
+                    <p className="text-[10px] text-center text-gray-500 mt-4">Un asesor confirmará tu compra sin compromiso.</p>
+                  </div>
+                )}
+              </motion.div>
+            </React.Fragment>
+          )}
+        </AnimatePresence>
+      );
+    }
+
+
+    // ═══════════════════════════════════════════
+    //  "WOW FACTOR" CONTEXT-AWARE CHATBOT
+    // ═══════════════════════════════════════════
+    /*
+     * ── SYSTEM PROMPT (Para futura API LLM) ──────────
+     * "Eres un vendedor experto de Tech Market. Usa el JSON para responder dudas. 
+     *  Sé conciso, persuasivo y no inventes información. Si te preguntan por un producto
+     *  que no está en el catálogo, indica que lo podemos importar a pedido."
+     */
+
+    function getBotResponse(input, activeProduct) {
+      const m = input.toLowerCase();
+
+      if (m.includes('precio') || m.includes('valor')) {
+        if (activeProduct) return `El **${activeProduct.name}** cuesta **$${activeProduct.price.toLocaleString('en-US')}**. Es una inversión excelente dadas sus características. ¿Buscas opciones de pago?`;
+        return 'Dime qué producto te interesa y te daré su precio exacto.';
+      }
+      if (m.includes('espec') || m.includes('caracter')) {
+        if (activeProduct) return `Claro, el punto fuerte del **${activeProduct.name}** es: ${Object.values(activeProduct.specs).join(" / ")} \nTiene una calidad top en su categoría.`;
+        return 'Si abres un producto y me preguntas por sus especificaciones, te detallaré lo más importante.';
+      }
+      return 'Soy tu asesor tecnológico de Tech Market. Si necesitas que te compare hardware o te sugiera la mejor laptop/GPU para tu presupuesto, solo dímelo.';
+    }
+
+    function Chatbot() {
+      const { activeProduct } = useStore();
+      const [isOpen, setIsOpen] = useState(false);
+      const [msgs, setMsgs] = useState([]);
+      const [input, setInput] = useState('');
+      const [typing, setTyping] = useState(false);
+      const endRef = useRef(null);
+
+      // Auto-scroll
+      useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs, typing]);
+
+      const addBot = useCallback((txt) => {
+        setTyping(true);
+        setTimeout(() => {
+          setMsgs(p => [...p, { r: 'bot', t: txt }]);
+          setTyping(false);
+        }, 800);
+      }, []);
+
+      const handleOpen = () => {
+        setIsOpen(true);
+        // Wow factor: Read context!
+        if (msgs.length === 0) {
+          if (activeProduct) {
+            addBot(`¡Excelente elección el ${activeProduct.name}! ¿Quieres saber algo sobre sus especificaciones o compatibilidad? 🚀`);
+          } else {
+            addBot('¡Hola! 👋 Soy tu asesor experto de Tech Market. ¿Buscas algún equipo de hardware específico o una laptop?');
+          }
+        }
+      };
+
+      // Re-context if product changes while open
+      useEffect(() => {
+        if (isOpen && activeProduct && msgs.length > 0) {
+          addBot(`Noté que ahora estás explorando el ${activeProduct.name}. ¡Buena actualización! ¿Dudas sobre su rendimiento?`);
+        }
+      }, [activeProduct]);
+
+      const handleSend = () => {
+        if (!input.trim()) return;
+        setMsgs(p => [...p, { r: 'user', t: input.trim() }]);
+        setInput('');
+        addBot(getBotResponse(input.trim(), activeProduct));
+      };
+
+      return (
+        <>
+          {/* Botón flotante */}
+          {!isOpen && (
+            <motion.button
+              whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+              onClick={handleOpen}
+              className="fixed bottom-6 right-6 z-[110] w-14 h-14 rounded-full neon-btn flex items-center justify-center shadow-xl shadow-neon-cyan/40 hover:shadow-neon-cyan/60 animate-[float_4s_ease-in-out_infinite]"
+            >
+              <Lucide.Bot size={26} className="text-white" />
+            </motion.button>
+          )}
+
+          {/* Widget */}
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 50, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                className="fixed bottom-6 right-6 z-[110] w-[360px] max-w-[calc(100vw-2rem)] h-[500px] max-h-[calc(100vh-6rem)] bg-dark-800 border border-white/10 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+              >
+                {/* Header */}
+                <div className="bg-gradient-to-r from-dark-700 to-dark-800 p-4 border-b border-white/5 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-neon-purple/20 border border-neon-purple/50 flex items-center justify-center shadow-[0_0_15px_#B026FF40]">
+                      <Lucide.Bot size={20} className="text-neon-purple" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white">Experto Tech</h3>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="text-[10px] text-gray-400 uppercase tracking-wide">En línea activo</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-white p-1 rounded-md hover:bg-white/10"><Lucide.ChevronDown size={20} /></button>
+                </div>
+
+                {/* Chat Body */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-dark-900/50">
+                  {msgs.map((m, i) => (
+                    <div key={i} className={`flex ${m.r === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[85%] p-3 text-sm rounded-2xl ${m.r === 'user' ? 'bg-neon-cyan/10 border border-neon-cyan/30 text-white rounded-br-sm'
+                        : 'bg-dark-700 border border-white/5 text-gray-200 rounded-bl-sm leading-relaxed'
+                        }`}>
+                        {/* Basic Markdown bold parser for bot */}
+                        {m.t.split('**').map((part, index) => index % 2 === 1 ? <strong key={index} className="text-white">{part}</strong> : part)}
+                      </div>
+                    </div>
+                  ))}
+                  {typing && (
+                    <div className="flex justify-start">
+                      <div className="bg-dark-700 border border-white/5 px-4 py-3 rounded-2xl rounded-bl-sm flex gap-1.5 items-center">
+                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  )}
+                  <div ref={endRef} />
+                </div>
+
+                {/* Input */}
+                <div className="p-3 bg-dark-800 border-t border-white/5">
+                  <div className="relative flex items-center">
+                    <input
+                      type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                      placeholder="Escribe tu consulta tecnológica..."
+                      className="w-full bg-dark-900 border border-white/10 rounded-full pl-4 pr-12 py-3 text-sm focus:outline-none focus:border-neon-purple/50 focus:bg-dark-800 transition-colors"
+                    />
+                    <button onClick={handleSend} className="absolute right-1.5 w-9 h-9 bg-neon-purple/20 text-neon-purple hover:bg-neon-purple hover:text-white rounded-full flex items-center justify-center transition-all">
+                      <Lucide.Send size={16} className="ml-0.5" />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      );
+    }
+
+    // ═══════════════════════════════════════════
+    //  MAIN LAYOUT & APP
+    // ═══════════════════════════════════════════
+    function App() {
+      return (
+        <StoreProvider>
+          <div className="min-h-screen bg-[#0B0D17] text-white selection:bg-neon-cyan/30 selection:text-white pb-20">
+            <TopBar />
+            <Header />
+
+            {/* Simple Page Header */}
+            <div className="max-w-7xl mx-auto px-4 md:px-6 mt-10 mb-2">
+              <h1 className="text-3xl md:text-4xl font-black">
+                Hardware <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-purple">&</span> Apple
+              </h1>
+              <p className="text-gray-400 mt-2 text-sm">Explora nuestro catálogo premium con componentes verificados y garantía directa.</p>
+            </div>
+
+            <ProductGrid />
+
+            {/* Modals & Overlays */}
+            <ProductModal />
+            <SlideOverCart />
+            <Chatbot />
+          </div>
+        </StoreProvider>
+      );
+    }
+
+    const root = createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
+
 </html>
