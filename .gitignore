@@ -1,6 +1,8 @@
-node_modules
+node_modules/
+dist/
+build/
 .env
-.env.local
-dist
-.vscode
+.env.*
+.vscode/
 .DS_Store
+package-lock.json
