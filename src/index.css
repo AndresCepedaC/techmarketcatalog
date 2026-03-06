@@ -12,7 +12,7 @@
   .glass {
     @apply bg-dark-900/85 backdrop-blur-[24px];
   }
-  
+
   .neon-btn {
     background: linear-gradient(135deg, #00E5FF, #B026FF);
   }
@@ -35,4 +35,70 @@
 /* Selection */
 ::selection {
   background: rgba(0, 229, 255, 0.3);
+}
+
+/* === MÓDULO A: Logo Neón === */
+.logo-tech {
+  isolation: isolate;
+  color: #E0FFFF;
+  text-shadow:
+    0 0 4px rgba(0, 255, 255, 0.8),
+    0 0 10px rgba(0, 255, 255, 0.5),
+    0 0 25px rgba(0, 255, 255, 0.25),
+    0 0 50px rgba(0, 255, 255, 0.1);
+  animation: neon-pulse 3s ease-in-out infinite;
+}
+
+@keyframes neon-pulse {
+
+  0%,
+  100% {
+    text-shadow:
+      0 0 4px rgba(0, 255, 255, 0.8),
+      0 0 10px rgba(0, 255, 255, 0.5),
+      0 0 25px rgba(0, 255, 255, 0.25);
+  }
+
+  50% {
+    text-shadow:
+      0 0 2px rgba(0, 255, 255, 0.5),
+      0 0 6px rgba(0, 255, 255, 0.3),
+      0 0 15px rgba(0, 255, 255, 0.15);
+  }
+}
+
+@media (max-width: 768px) {
+  .logo-tech {
+    text-shadow:
+      0 0 2px rgba(0, 255, 255, 0.48),
+      0 0 6px rgba(0, 255, 255, 0.3),
+      0 0 15px rgba(0, 255, 255, 0.15),
+      0 0 30px rgba(0, 255, 255, 0.06);
+  }
+}
+
+/* === MÓDULO B: Skeleton Shimmer === */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #1a1a2e 25%, #2d2d5e 50%, #1a1a2e 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.img-fade-in {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.img-fade-in.loaded {
+  opacity: 1;
 }

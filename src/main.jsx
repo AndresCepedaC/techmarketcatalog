@@ -54,6 +54,23 @@ function StoreProvider({ children }) {
 
 function useStore() { return useContext(StoreContext); }
 
+// ═══════════════════════════════════════════
+//  LAZY LOAD HOOK (IntersectionObserver)
+// ═══════════════════════════════════════════
+function useImageLazyLoad(ref, src, eager = false) {
+  const [loadSrc, setLoadSrc] = useState(eager ? src : null);
+  useEffect(() => {
+    if (eager) { setLoadSrc(src); return; }
+    if (!ref.current) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setLoadSrc(src); obs.disconnect(); }
+    }, { rootMargin: '300px' });
+    obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [src, eager, ref]);
+  return loadSrc;
+}
+
 // (Rest of the components: TopBar, Header, CategoryFilters, ProductCard, ProductGrid, ImageMagnifier, ProductModal, Chatbot, App)
 // Copiaré la lógica de index.html aquí, pero corrigiendo SlideOverCart y GROQ_API_KEY.
 
@@ -91,14 +108,14 @@ function Header() {
             <div className="relative flex items-center gap-2">
               <div className="relative">
                 <Lucide.Zap size={28} className="text-neon-cyan relative z-10 filter drop-shadow-[0_0_8px_#00E5FF80]" />
-                <motion.div 
+                <motion.div
                   animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
                   transition={{ duration: 2, repeat: Infinity }}
                   className="absolute inset-0 bg-neon-cyan rounded-full blur-md"
                 />
               </div>
               <span className="text-xl md:text-2xl font-black tracking-tighter text-white group-hover:text-neon-cyan transition-colors">
-                TECH<span className="text-neon-cyan group-hover:text-white transition-colors">MARKET</span>
+                <span className="logo-tech">TECH</span><span className="text-neon-cyan group-hover:text-white transition-colors">MARKET</span>
               </span>
             </div>
           </div>
@@ -169,8 +186,15 @@ function ProductCard({ product, index }) {
   const { setActiveProduct } = useStore();
   const [currentImg, setCurrentImg] = useState(0);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const imgContainerRef = useRef(null);
   const fotos = product?.fotos || (product?.image ? [product.image] : [`https://placehold.co/300x300/1C2039/00E5FF?text=${encodeURIComponent(product?.name || 'Tech')}`]);
-  
+
+  const isEager = index < 6;
+  const lazySrc = useImageLazyLoad(imgContainerRef, fotos[currentImg], isEager);
+
+  // Reset imgLoaded when image source changes
+  useEffect(() => { setImgLoaded(false); }, [currentImg]);
+
   const handleNextImg = (e) => { e.stopPropagation(); setCurrentImg((prev) => (prev + 1) % fotos.length); };
   const handlePrevImg = (e) => { e.stopPropagation(); setCurrentImg((prev) => (prev - 1 + fotos.length) % fotos.length); };
   const handleWhatsAppDirect = (e) => {
@@ -183,27 +207,32 @@ function ProductCard({ product, index }) {
     <motion.div variants={itemVariants} className="group relative glass border border-white/10 rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:-translate-y-3 hover:shadow-[0_8px_30px_#00E5FF40] hover:border-neon-cyan/50" onClick={() => setActiveProduct(product)}>
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-neon-purple/30 via-neon-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
       {product?.isPromo && <div className="absolute top-3 right-3 z-10 bg-gradient-to-r from-neon-pink to-neon-purple px-3 py-1 text-[10px] uppercase font-black tracking-widest text-white rounded-full">Oferta Neón</div>}
-      <div className="relative h-56 bg-dark-900/40 border-b border-white/5 overflow-hidden p-6 flex items-center justify-center">
+      <div ref={imgContainerRef} className="relative h-56 bg-dark-900/40 border-b border-white/5 overflow-hidden p-6 flex items-center justify-center">
         {fotos.length > 1 && (
           <>
             <button onClick={handlePrevImg} className="absolute left-2 z-20 p-1.5 bg-black/40 hover:bg-neon-cyan/30 text-white rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100"><Lucide.ChevronLeft size={16} /></button>
             <button onClick={handleNextImg} className="absolute right-2 z-20 p-1.5 bg-black/40 hover:bg-neon-cyan/30 text-white rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100"><Lucide.ChevronRight size={16} /></button>
           </>
         )}
-        <AnimatePresence mode="wait">
-          <div className={`absolute inset-0 bg-slate-800/50 animate-pulse transition-opacity duration-500 ${imgLoaded ? 'opacity-0' : 'opacity-100'}`} />
-          <motion.img 
-            key={currentImg} 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: imgLoaded ? 1 : 0 }} 
-            src={fotos[currentImg]} 
+        {/* Skeleton shimmer placeholder */}
+        <div className={`absolute inset-0 skeleton-shimmer transition-opacity duration-500 ${imgLoaded ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} />
+        {lazySrc && (
+          <motion.img
+            key={currentImg}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: imgLoaded ? 1 : 0 }}
+            transition={{ duration: 0.4 }}
+            src={lazySrc}
+            alt={product?.name || 'Producto'}
+            width={400}
+            height={400}
+            style={{ aspectRatio: '1/1' }}
             onLoad={() => setImgLoaded(true)}
-            fetchpriority={index < 6 ? "high" : "auto"}
-            loading={index < 6 ? "eager" : "lazy"}
+            fetchpriority={isEager ? "high" : "auto"}
             decoding="async"
-            className="w-full h-full object-contain group-hover:scale-105 transition-all duration-700" 
+            className="w-full h-full object-contain group-hover:scale-105 transition-all duration-700"
           />
-        </AnimatePresence>
+        )}
         <div className="absolute top-3 left-3 z-10 glass px-2.5 py-1 text-[10px] uppercase font-bold text-neon-cyan border border-neon-cyan/30 rounded-lg">{product?.category}</div>
       </div>
       <div className="p-5 flex flex-col h-[150px]">
@@ -286,7 +315,7 @@ function ProductModal() {
             <h2 className="text-3xl font-black mb-2">{activeProduct.name}</h2>
             <div className="text-3xl font-bold text-neon-cyan mb-6">${activeProduct.price.toLocaleString('en-US')}</div>
             <div className="mb-8 space-y-2">
-              {Object.entries(activeProduct.specs).map(([k,v]) => (
+              {Object.entries(activeProduct.specs).map(([k, v]) => (
                 <div key={k} className="flex justify-between border-b border-white/5 py-2 text-sm">
                   <span className="text-gray-400">{k}</span><span className="text-white">{v}</span>
                 </div>
@@ -326,7 +355,7 @@ async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProd
     console.warn("Aura Debug: No VITE_GROQ_API_KEY found.");
     return { ok: false, text: "⚠️ Modo Demo: No hay API Key configurada." };
   }
-  
+
   try {
     // Truncate catalog to first 20 products to avoid token limits
     const safeCatalog = (productsContext || []).slice(0, 20).map(p => ({
@@ -348,9 +377,9 @@ async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProd
       { role: "system", content: systemPrompt },
       ...chatHistory
         .filter(m => m && m.r !== 'error')
-        .map(m => ({ 
-          role: m.r === 'user' ? 'user' : 'assistant', 
-          content: String(m.t || '') 
+        .map(m => ({
+          role: m.r === 'user' ? 'user' : 'assistant',
+          content: String(m.t || '')
         })),
       { role: "user", content: String(userMessage) }
     ];
@@ -358,8 +387,8 @@ async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProd
     // Strict sanitization before sending
     const messages = sanitizeMessages(rawMessages);
 
-    const payload = { 
-      model: GROQ_MODEL, 
+    const payload = {
+      model: GROQ_MODEL,
       messages,
       temperature: 0.7,
       max_tokens: 512
@@ -370,9 +399,9 @@ async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProd
 
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 
-        'Authorization': `Bearer ${GROQ_API_KEY}`, 
-        'Content-Type': 'application/json' 
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
     });
@@ -391,9 +420,9 @@ async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProd
     const data = await res.json();
     const content = data.choices?.[0]?.message?.content;
     return { ok: true, text: content || "No pude generar una respuesta." };
-  } catch (error) { 
+  } catch (error) {
     console.error("Error crítico en fetchGroqIA:", error);
-    return { ok: false, text: "Lo siento, hubo un problema conectando con el asistente. ¿Podemos hablar por WhatsApp?" }; 
+    return { ok: false, text: "Lo siento, hubo un problema conectando con el asistente. ¿Podemos hablar por WhatsApp?" };
   }
 }
 
@@ -403,7 +432,7 @@ function ChatErrorBubble({ text }) {
     <div className="p-3 text-[13px] rounded-xl max-w-[85%] bg-dark-700 text-gray-300 space-y-2">
       <p>{text}</p>
       <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer"
-         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold rounded-lg transition-colors">
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold rounded-lg transition-colors">
         <Lucide.MessageCircle size={14} /> Chatear por WhatsApp
       </a>
     </div>
@@ -423,13 +452,13 @@ function Chatbot() {
   const handleSend = async () => {
     if (!input.trim() || typing) return;
     const userTxt = input.trim();
-    
+
     setMsgs(prev => [...prev, { r: 'user', t: userTxt }]);
     setInput('');
     setTyping(true);
-    
+
     const result = await fetchGroqIA(userTxt, msgs, window.PRODUCTS || [], activeProduct);
-    
+
     // Mark error messages so they don't pollute history sent to Groq
     setMsgs(prev => [...prev, { r: result.ok ? 'bot' : 'error', t: result.text }]);
     setTyping(false);
@@ -452,7 +481,7 @@ function Chatbot() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {msgs.map((m, i) => (
                 <div key={i} className={`flex ${m.r === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  {m.r === 'error' 
+                  {m.r === 'error'
                     ? <ChatErrorBubble text={m.t} />
                     : <div className={`p-3 text-[13px] rounded-xl max-w-[85%] whitespace-pre-wrap ${m.r === 'user' ? 'bg-neon-cyan/20 text-white' : 'bg-dark-700 text-gray-300'}`}>{m.t}</div>
                   }
@@ -503,7 +532,7 @@ function App() {
       <div className="min-h-screen bg-dark-900 text-white selection:bg-neon-cyan/30 pb-20">
         <TopBar />
         <Header />
-        
+
         <section className="relative overflow-hidden pt-20 pb-32">
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-neon-cyan/5 rounded-full blur-[100px]" />
           <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10 text-center md:text-left">
@@ -521,7 +550,7 @@ function App() {
 
         <div id="grid-start" />
         <ProductGrid />
-        
+
         <ProductModal />
         <Chatbot />
       </div>
