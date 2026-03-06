@@ -11,17 +11,17 @@ const mockProducts = [
     // 🏍️ Nueva Categoría: Intercomunicadores
     {
         id: "101", name: "Intercomunicador K06A", price: 40000, category: "Intercomunicadores", isPromo: true,
-        fotos: ["/photos/intercoms", "https://placehold.co/400x400/1C2039/B026FF?text=K06A+Lateral", "https://placehold.co/400x400/1C2039/FF2D95?text=K06A+Accesorios"],
+        fotos: ["/photos/intercoms.png", "https://placehold.co/400x400/1C2039/B026FF?text=K06A+Lateral", "https://placehold.co/400x400/1C2039/FF2D95?text=K06A+Accesorios"],
         specs: { "Conectividad": "Bluetooth 5.0", "Batería": "500mAh (Garantizado)", "Resistencia": "IPX6 (Lluvia)", "Perfil": "Motociclismo Urbano" }
     },
     {
         id: "102", name: "Intercomunicador Y30A", price: 45000, category: "Intercomunicadores", isPromo: false,
-        fotos: ["/photos/intercoms", "https://placehold.co/400x400/1C2039/B026FF?text=Y30A+Casco", "https://placehold.co/400x400/1C2039/FF2D95?text=Y30A+Caja"],
+        fotos: ["/photos/intercoms.png", "https://placehold.co/400x400/1C2039/B026FF?text=Y30A+Casco", "https://placehold.co/400x400/1C2039/FF2D95?text=Y30A+Caja"],
         specs: { "Rango": "Hasta 1000m", "Intercom múltiple": "Sí (2 Riders)", "Cancelación de Ruido": "DSP Avanzado", "Resistencia": "IP67" }
     },
     {
         id: "103", name: "Intercomunicador Q58", price: 85000, category: "Intercomunicadores", isPromo: true,
-        fotos: ["/photos/intercoms", "https://placehold.co/400x400/1C2039/B026FF?text=Q58+Microfono", "https://placehold.co/400x400/1C2039/FF2D95?text=Q58+Instalado"],
+        fotos: ["/photos/intercoms.png", "https://placehold.co/400x400/1C2039/B026FF?text=Q58+Microfono", "https://placehold.co/400x400/1C2039/FF2D95?text=Q58+Instalado"],
         specs: { "Batería": "1000mAh Larga duración", "Chip": "Qualcomm Dual", "Música Compartida": "Soportado", "Audio": "Hi-Fi Estéreo" }
     },
 
