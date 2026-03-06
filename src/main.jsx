@@ -165,9 +165,10 @@ function CategoryFilters() {
 const containerVariants = { show: { transition: { staggerChildren: 0.1 } } };
 const itemVariants = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
-function ProductCard({ product }) {
+function ProductCard({ product, index }) {
   const { setActiveProduct } = useStore();
   const [currentImg, setCurrentImg] = useState(0);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const fotos = product?.fotos || (product?.image ? [product.image] : [`https://placehold.co/300x300/1C2039/00E5FF?text=${encodeURIComponent(product?.name || 'Tech')}`]);
   
   const handleNextImg = (e) => { e.stopPropagation(); setCurrentImg((prev) => (prev + 1) % fotos.length); };
@@ -190,7 +191,18 @@ function ProductCard({ product }) {
           </>
         )}
         <AnimatePresence mode="wait">
-          <motion.img key={currentImg} initial={{ opacity: 0 }} animate={{ opacity: 1 }} src={fotos[currentImg]} className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700" />
+          <div className={`absolute inset-0 bg-slate-800/50 animate-pulse transition-opacity duration-500 ${imgLoaded ? 'opacity-0' : 'opacity-100'}`} />
+          <motion.img 
+            key={currentImg} 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: imgLoaded ? 1 : 0 }} 
+            src={fotos[currentImg]} 
+            onLoad={() => setImgLoaded(true)}
+            fetchpriority={index < 6 ? "high" : "auto"}
+            loading={index < 6 ? "eager" : "lazy"}
+            decoding="async"
+            className="w-full h-full object-contain group-hover:scale-105 transition-all duration-700" 
+          />
         </AnimatePresence>
         <div className="absolute top-3 left-3 z-10 glass px-2.5 py-1 text-[10px] uppercase font-bold text-neon-cyan border border-neon-cyan/30 rounded-lg">{product?.category}</div>
       </div>
@@ -231,7 +243,7 @@ function ProductGrid() {
           <div key={cat} className="flex flex-col gap-6">
             <h2 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neon-purple to-neon-cyan border-b border-white/10 pb-2 w-fit">{cat}</h2>
             <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filtered.filter(p => p.category === cat).map(p => <ProductCard key={p.id} product={p} />)}
+              {filtered.filter(p => p.category === cat).map((p, idx) => <ProductCard key={p.id} product={p} index={idx} />)}
             </motion.div>
           </div>
         ))}
@@ -417,6 +429,18 @@ function Chatbot() {
 //  APP & HERO
 // ═══════════════════════════════════════════
 function App() {
+  useEffect(() => {
+    // Pre-load images for the first 6 products
+    const productsToPreload = (window.PRODUCTS || []).slice(0, 6);
+    productsToPreload.forEach(p => {
+      const imgPath = p.fotos?.[0] || p.image;
+      if (imgPath) {
+        const img = new Image();
+        img.src = imgPath;
+      }
+    });
+  }, []);
+
   return (
     <StoreProvider>
       <div className="min-h-screen bg-dark-900 text-white selection:bg-neon-cyan/30 pb-20">
