@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO -->
+  <title>TechVault — Catálogo de Tecnología</title>
+  <meta name="description" content="Explora los mejores productos de tecnología: laptops, smartphones, periféricos y más. Catálogo en línea con las últimas novedades tech." />
+  <meta name="theme-color" content="#0a0a0f" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="TechVault — Catálogo de Tecnología" />
+  <meta property="og:description" content="Descubre lo último en tecnología. Laptops, smartphones y accesorios premium." />
+  <meta property="og:type" content="website" />
+
+  <!-- Favicon (inline SVG) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- ====== NAVBAR ====== -->
+  <nav class="navbar" id="navbar">
+    <a href="#" class="navbar__brand">
+      <span class="navbar__brand-icon">⚡</span>
+      TechVault
+    </a>
+    <span class="navbar__tagline">Catálogo de Tecnología</span>
+  </nav>
+
+  <!-- ====== HERO ====== -->
+  <header class="hero">
+    <span class="hero__badge">✦ Catálogo 2026</span>
+    <h1 class="hero__title">Descubre lo último en <span>Tecnología</span></h1>
+    <p class="hero__subtitle">
+      Explora nuestra selección curada de productos tech: desde laptops ultraligeras hasta periféricos de élite.
+    </p>
+  </header>
+
+  <!-- ====== SEARCH ====== -->
+  <div class="search-wrapper">
+    <div class="search">
+      <span class="search__icon">🔍</span>
+      <input
+        type="text"
+        id="search-input"
+        class="search__input"
+        placeholder="Buscar productos por nombre..."
+        autocomplete="off"
+      />
+    </div>
+    <p id="product-count" class="search__count"></p>
+  </div>
+
+  <!-- ====== CATALOG GRID ====== -->
+  <main class="catalog">
+    <div class="product-grid" id="product-grid">
+      <!-- Cards injected by JS -->
+    </div>
+  </main>
+
+  <!-- ====== FOOTER ====== -->
+  <footer class="footer">
+    <p>&copy; 2026 TechVault. Todos los derechos reservados. Catálogo con fines demostrativos.</p>
+  </footer>
+
+  <!-- App Script -->
+  <script src="js/app.js"></script>
+</body>
+</html>
