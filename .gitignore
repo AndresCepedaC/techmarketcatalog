@@ -3,6 +3,8 @@ dist/
 build/
 .env
 .env.*
+*.local
 .vscode/
 .DS_Store
-package-lock.json
+Thumbs.db
+limpieza.bat

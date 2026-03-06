@@ -312,9 +312,14 @@ async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProd
   }
   
   try {
-    const productsString = JSON.stringify(productsContext);
+    // Truncate catalog to first 20 products to avoid token limits
+    const safeCatalog = (productsContext || []).slice(0, 20).map(p => ({
+      id: p.id, name: p.name, price: p.price, category: p.category,
+      specs: p.specs
+    }));
+    const productsString = JSON.stringify(safeCatalog);
     
-    // Rule B: Strict string concatenation for system prompt
+    // System prompt with stringified product data
     const systemPrompt = "Eres 'Aura', la asesora experta y ultra-persuasiva de 'Tech Market'. " +
       "Tu personalidad es servicial, brillante y directa. " +
       "Catálogo actual disponible: " + productsString + " " +
@@ -322,23 +327,26 @@ async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProd
       "Contexto: El cliente está viendo " + (activeProduct ? activeProduct.name : "la página principal") + ". " +
       "Objetivo: Invitar a contactar por WhatsApp: https://wa.me/573005054912";
 
-    // Rule A: Clean and Flat Messages array
+    // Flat messages array — no nested arrays, no empty messages, strict roles
     const messages = [
       { role: "system", content: systemPrompt },
-      ...chatHistory.map(m => ({ 
-        role: m.r === 'user' ? 'user' : 'assistant', 
-        content: String(m.t) 
-      })).filter(m => m.content.trim() !== ""),
+      ...chatHistory
+        .filter(m => m && m.t && String(m.t).trim() !== "")
+        .map(m => ({ 
+          role: m.r === 'user' ? 'user' : 'assistant', 
+          content: String(m.t) 
+        })),
       { role: "user", content: String(userMessage) }
     ];
 
-    // Rule C: Standard model and minimal parameters
     const payload = { 
       model: "llama3-8b-8192", 
-      messages: messages
+      messages,
+      temperature: 0.7,
+      max_tokens: 512
     };
 
-    console.log("Aura Debug: Enviando payload...", payload);
+    console.log("Aura Debug: Enviando payload...", JSON.stringify(payload, null, 2));
 
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -350,17 +358,23 @@ async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProd
     });
 
     if (!res.ok) {
-      // Step 1: Detailed Error Extraction
-      const errorDetail = await res.json().catch(() => ({ error: "Unknown payload error" }));
-      console.error("Detalle del Error de Groq:", errorDetail);
-      throw new Error(`Groq API Error ${res.status}`);
+      // Extract detailed error from Groq response body
+      let errorDetail;
+      try {
+        errorDetail = await res.json();
+      } catch {
+        errorDetail = { error: { message: `HTTP ${res.status} — no parseable body` } };
+      }
+      console.error(`Groq API Error ${res.status}:`, JSON.stringify(errorDetail, null, 2));
+      const friendlyMsg = errorDetail?.error?.message || `Error ${res.status}`;
+      throw new Error(friendlyMsg);
     }
 
     const data = await res.json();
-    return data.choices[0].message.content;
+    return data.choices?.[0]?.message?.content || "No pude generar una respuesta.";
   } catch (error) { 
     console.error("Error crítico en fetchGroqIA:", error);
-    return "Lo siento, hubo un problema con mi sistema. ¿Podemos hablar por WhatsApp?"; 
+    return `Lo siento, hubo un problema técnico. ¿Podemos hablar por WhatsApp? (${error.message})`; 
   }
 }
 
@@ -407,9 +421,18 @@ function Chatbot() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {msgs.map((m, i) => (
                 <div key={i} className={`flex ${m.r === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`p-3 text-[13px] rounded-xl max-w-[85%] ${m.r === 'user' ? 'bg-neon-cyan/20 text-white' : 'bg-dark-700 text-gray-300'}`}>{m.t}</div>
+                  <div className={`p-3 text-[13px] rounded-xl max-w-[85%] whitespace-pre-wrap ${m.r === 'user' ? 'bg-neon-cyan/20 text-white' : 'bg-dark-700 text-gray-300'}`}>{m.t}</div>
                 </div>
               ))}
+              {typing && (
+                <div className="flex justify-start">
+                  <div className="p-3 bg-dark-700 rounded-xl flex gap-1 items-center">
+                    <span className="w-2 h-2 bg-neon-cyan rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 bg-neon-cyan rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 bg-neon-cyan rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              )}
               <div ref={endRef} />
             </div>
             <div className="p-3 border-t border-white/5">
