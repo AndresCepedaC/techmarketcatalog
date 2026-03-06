@@ -293,14 +293,21 @@ function ProductModal() {
 const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || '';
 
 async function fetchGroqIA(userMessage, productsContext, activeProduct) {
-  if (!GROQ_API_KEY) return "⚠️ **Modo Demo**: No hay API Key configurada. Por favor, añade VITE_GROQ_API_KEY en Vercel.";
+  if (!GROQ_API_KEY) {
+    console.warn("Aura Debug: No VITE_GROQ_API_KEY found in environment.");
+    return "⚠️ **Modo Demo**: No hay API Key configurada. Por favor, añade VITE_GROQ_API_KEY en Vercel.";
+  }
+  
   try {
+    const productsString = JSON.stringify(productsContext, null, 2);
+    console.log("Aura Debug: Contexto de productos cargado (" + productsContext?.length + " items)");
+
     const systemPrompt = `
       Eres "Aura", la asesora experta y ultra-persuasiva de "Tech Market". 
       Tu personalidad es servicial, brillante y directa. Hablas con confianza sobre el hardware más avanzado.
       
       Catálogo actual disponible:
-      ${JSON.stringify(productsContext, null, 2)}
+      ${productsString}
       
       Protocolo de respuesta:
       1. Solo ofrece productos que estén en el catálogo. No inventes precios.
@@ -309,19 +316,40 @@ async function fetchGroqIA(userMessage, productsContext, activeProduct) {
       4. Contexto: El cliente está viendo: ${activeProduct ? `"${activeProduct.name}"` : 'la página principal'}.
       5. Objetivo: Cerrar el trato e invitar al cliente a contactarnos por WhatsApp.
     `;
+
+    const payload = { 
+      model: "llama3-8b-8192", 
+      messages: [
+        { role: "system", content: systemPrompt }, 
+        { role: "user", content: userMessage }
+      ], 
+      temperature: 0.6,
+      max_tokens: 250
+    };
+
+    console.log("Aura Debug: Enviando petición a Groq...", { model: payload.model });
+
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        model: "llama3-8b-8192", 
-        messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userMessage }], 
-        temperature: 0.6,
-        max_tokens: 250
-      })
+      headers: { 
+        'Authorization': `Bearer ${GROQ_API_KEY}`, 
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify(payload)
     });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      console.error("Error exacto de Groq (HTTP " + res.status + "):", errorData);
+      throw new Error(`Groq API returned ${res.status}`);
+    }
+
     const data = await res.json();
     return data.choices[0].message.content;
-  } catch (e) { return "Lo siento, hubo un problema con mi sistema. ¿Podemos hablar por WhatsApp?"; }
+  } catch (error) { 
+    console.error("Error exacto de Groq:", error);
+    return "Lo siento, hubo un problema con mi sistema. ¿Podemos hablar por WhatsApp?"; 
+  }
 }
 
 function Chatbot() {
