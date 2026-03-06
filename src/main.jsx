@@ -63,8 +63,8 @@ function TopBar() {
         <a href="mailto:info@techmarket.com" className="flex items-center gap-1.5 hover:text-neon-cyan transition-colors">
           <Lucide.Mail size={12} /> info@techmarket.com
         </a>
-        <a href="https://wa.me/573000000000" target="_blank" className="flex items-center gap-1.5 hover:text-neon-cyan transition-colors">
-          <Lucide.Phone size={12} /> +57 300 000 0000
+        <a href="https://wa.me/573005054912" target="_blank" className="flex items-center gap-1.5 hover:text-neon-cyan transition-colors">
+          <Lucide.Phone size={12} /> +57 300 505 4912
         </a>
       </div>
       <div className="flex items-center gap-4">
@@ -295,15 +295,33 @@ const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || '';
 async function fetchGroqIA(userMessage, productsContext, activeProduct) {
   if (!GROQ_API_KEY) return "⚠️ **Modo Demo**: No hay API Key configurada. Por favor, añade VITE_GROQ_API_KEY en Vercel.";
   try {
-    const systemPrompt = `Eres Aura de Tech Market. Catalogo: ${JSON.stringify(productsContext)}. Responde corto y usa negritas.`;
+    const systemPrompt = `
+      Eres "Aura", la asesora experta y ultra-persuasiva de "Tech Market". 
+      Tu personalidad es servicial, brillante y directa. Hablas con confianza sobre el hardware más avanzado.
+      
+      Catálogo actual disponible:
+      ${JSON.stringify(productsContext, null, 2)}
+      
+      Protocolo de respuesta:
+      1. Solo ofrece productos que estén en el catálogo. No inventes precios.
+      2. Si no hay stock exacto, recomienda lo más cercano con entusiasmo.
+      3. Estilo: Usa negritas para nombres y precios. Sé breve e impactante.
+      4. Contexto: El cliente está viendo: ${activeProduct ? `"${activeProduct.name}"` : 'la página principal'}.
+      5. Objetivo: Cerrar el trato e invitar al cliente a contactarnos por WhatsApp.
+    `;
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: "llama3-8b-8192", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userMessage }], temperature: 0.6 })
+      body: JSON.stringify({ 
+        model: "llama3-8b-8192", 
+        messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userMessage }], 
+        temperature: 0.6,
+        max_tokens: 250
+      })
     });
     const data = await res.json();
     return data.choices[0].message.content;
-  } catch (e) { return "Error de IA. Contacta por WhatsApp."; }
+  } catch (e) { return "Lo siento, hubo un problema con mi sistema. ¿Podemos hablar por WhatsApp?"; }
 }
 
 function Chatbot() {
@@ -376,8 +394,8 @@ function App() {
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-neon-cyan/5 rounded-full blur-[100px]" />
           <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10 text-center md:text-left">
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-              <span className="text-xs font-bold text-neon-cyan tracking-widest uppercase bg-white/5 border border-white/10 px-4 py-1.5 rounded-full">Tecnología de Vanguardia</span>
-              <h1 className="text-6xl md:text-8xl font-black mt-8 mb-6 leading-[0.9]">Potencia <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-white to-neon-purple">Sin Límites.</span></h1>
+              <span className="text-xs font-bold text-neon-cyan tracking-widest uppercase bg-white/5 border border-white/10 px-4 py-1.5 rounded-full">Tecnología de Punta</span>
+              <h1 className="text-4xl md:text-6xl font-black mt-8 mb-6 leading-tight">La mejor tecnología <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-white to-neon-purple">al mejor precio del mercado.</span></h1>
               <p className="text-gray-400 text-lg md:text-xl max-w-2xl mb-12">Explora nuestro catálogo exclusivo de hardware premium y componentes de alto rendimiento para proyectos ambiciosos.</p>
               <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start">
                 <button onClick={() => document.getElementById('grid-start').scrollIntoView({ behavior: 'smooth' })} className="px-10 py-4 bg-gradient-to-r from-neon-cyan to-neon-purple rounded-2xl font-black text-white shadow-xl flex items-center justify-center gap-2">VER CATÁLOGO <Lucide.ArrowRight size={20} /></button>
