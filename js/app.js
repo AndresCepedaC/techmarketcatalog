@@ -2,7 +2,7 @@
    TECH CATALOG – Main Application Logic
    ============================================ */
 
-const DATA_URL = './data/productos.json';
+const DATA_URL = '/data/productos.json';
 
 // ---------- DOM References ----------
 const productGrid    = document.getElementById('product-grid');
