@@ -235,9 +235,10 @@ function ProductCard({ product, index }) {
         )}
         <div className="absolute top-3 left-3 z-10 glass px-2.5 py-1 text-[10px] uppercase font-bold text-neon-cyan border border-neon-cyan/30 rounded-lg">{product?.category}</div>
       </div>
-      <div className="p-5 flex flex-col h-[150px]">
+      <div className="p-5 flex flex-col h-[170px]">
         <h3 className="font-semibold text-sm text-gray-100 mb-1 line-clamp-2 group-hover:text-neon-cyan">{product?.name}</h3>
-        <p className="text-[11px] text-gray-500 mb-4 line-clamp-2">{product?.specs ? Object.values(product.specs).join(" • ") : 'Sin especificaciones'}</p>
+        {product?.descripcion && <p className="text-[11px] text-gray-400 mb-2 product-desc-clamp">{product.descripcion}</p>}
+        <p className="text-[10px] text-gray-500 mb-4 line-clamp-1">{product?.specs ? Object.values(product.specs).join(" • ") : ''}</p>
         <div className="flex items-center justify-between mt-auto">
           <span className="text-xl font-bold text-white group-hover:text-neon-cyan transition-all">${product?.price?.toLocaleString('en-US')}</span>
           <button onClick={handleWhatsAppDirect} className="w-10 h-10 rounded-xl glass border border-[#25D366]/30 flex items-center justify-center text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all"><Lucide.MessageCircle size={18} /></button>
@@ -313,6 +314,7 @@ function ProductModal() {
           <div className="w-full md:w-1/2 p-5 bg-dark-900/50 min-h-[300px]"><ImageMagnifier src={activeProduct?.fotos?.[0] || activeProduct?.image} /></div>
           <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col">
             <h2 className="text-3xl font-black mb-2">{activeProduct.name}</h2>
+            {activeProduct.descripcion && <p className="text-sm text-gray-400 mb-4" style={{ lineHeight: '1.6' }}>{activeProduct.descripcion}</p>}
             <div className="text-3xl font-bold text-neon-cyan mb-6">${activeProduct.price.toLocaleString('en-US')}</div>
             <div className="mb-8 space-y-2">
               {Object.entries(activeProduct.specs).map(([k, v]) => (
@@ -439,15 +441,67 @@ function ChatErrorBubble({ text }) {
   );
 }
 
+const INVITE_PHRASES = [
+  "¿Tienes alguna pregunta? 💬",
+  "¿Qué producto estás buscando? 🔍",
+  "Pregunta lo que quieras 😊",
+  "¿Cuánto cuesta? Pregúntame 👇",
+  "Te ayudo a elegir el mejor 🤙",
+  "¿Primera vez aquí? Con gusto te oriento 🙋"
+];
+
 function Chatbot() {
   const { activeProduct } = useStore();
   const [isOpen, setIsOpen] = useState(false);
   const [msgs, setMsgs] = useState([]);
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
+  const [bubbleText, setBubbleText] = useState(INVITE_PHRASES[0]);
+  const [showBubble, setShowBubble] = useState(false);
   const endRef = useRef(null);
+  const bubbleTimers = useRef({ show: null, rotate: null, hide: null });
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs, typing]);
+
+  // Invite bubble logic
+  useEffect(() => {
+    if (sessionStorage.getItem('chatOpened') || isOpen) return;
+
+    let phraseIndex = 0;
+
+    bubbleTimers.current.show = setTimeout(() => {
+      setShowBubble(true);
+
+      bubbleTimers.current.rotate = setInterval(() => {
+        setShowBubble(false);
+        setTimeout(() => {
+          phraseIndex = (phraseIndex + 1) % INVITE_PHRASES.length;
+          setBubbleText(INVITE_PHRASES[phraseIndex]);
+          setShowBubble(true);
+        }, 350);
+      }, 4500);
+
+      bubbleTimers.current.hide = setTimeout(() => {
+        clearInterval(bubbleTimers.current.rotate);
+        setShowBubble(false);
+      }, 22000);
+    }, 2500);
+
+    return () => {
+      clearTimeout(bubbleTimers.current.show);
+      clearInterval(bubbleTimers.current.rotate);
+      clearTimeout(bubbleTimers.current.hide);
+    };
+  }, [isOpen]);
+
+  const handleOpenChat = () => {
+    setIsOpen(true);
+    setShowBubble(false);
+    clearTimeout(bubbleTimers.current.show);
+    clearInterval(bubbleTimers.current.rotate);
+    clearTimeout(bubbleTimers.current.hide);
+    sessionStorage.setItem('chatOpened', 'true');
+  };
 
   const handleSend = async () => {
     if (!input.trim() || typing) return;
@@ -467,9 +521,17 @@ function Chatbot() {
   return (
     <>
       {!isOpen && (
-        <button onClick={() => setIsOpen(true)} className="fixed bottom-6 right-6 z-[110] w-14 h-14 rounded-full bg-gradient-to-r from-neon-cyan to-neon-purple flex items-center justify-center shadow-xl shadow-neon-cyan/20 animate-bounce">
-          <Lucide.Bot size={26} className="text-white" />
-        </button>
+        <div className="fixed bottom-6 right-6 z-[110]" style={{ position: 'fixed' }}>
+          {/* Invite bubble */}
+          <div className={`chat-invite-bubble ${showBubble ? 'visible' : ''}`}>
+            {bubbleText}
+          </div>
+          {/* Chat toggle button */}
+          <button onClick={handleOpenChat} className="relative w-14 h-14 rounded-full bg-gradient-to-r from-neon-cyan to-neon-purple flex items-center justify-center shadow-xl shadow-neon-cyan/20 animate-bounce">
+            <Lucide.Bot size={26} className="text-white" />
+            {!sessionStorage.getItem('chatOpened') && <span className="chat-notification-dot" />}
+          </button>
+        </div>
       )}
       <AnimatePresence>
         {isOpen && (
