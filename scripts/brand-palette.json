@@ -1,0 +1,12 @@
+{
+  "primary": "#0B1D29",
+  "secondary": "#4BA99F",
+  "accent": "#EBFFFF",
+  "dark_bg": "#0B0D17",
+  "variants": {
+    "primary_light": "#0E2635",
+    "primary_dark": "#08141D",
+    "glow": "rgba(11, 29, 41, 0.5)",
+    "ultra_glow": "rgba(11, 29, 41, 0.2)"
+  }
+}
