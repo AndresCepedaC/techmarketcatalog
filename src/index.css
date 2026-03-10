@@ -12,9 +12,15 @@
   .glass {
     @apply bg-dark-900/85 backdrop-blur-[24px];
   }
-  
-  .neon-btn {
-    background: linear-gradient(135deg, #00E5FF, #B026FF);
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 

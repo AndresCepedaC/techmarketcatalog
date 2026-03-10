@@ -7,6 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
+        brand: {
+          cyan: '#00E5FF',
+          purple: '#B026FF',
+          pink: '#FF2D95',
+          bg: '#0B0D17',
+          card: '#111427',
+          border: 'rgba(255, 255, 255, 0.1)'
+        },
         dark: {
           900: '#0B0D17',
           800: '#111427',
