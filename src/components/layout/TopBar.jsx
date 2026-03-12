@@ -1,3 +1,4 @@
+// [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
 import React from 'react';
 import * as Lucide from 'lucide-react';
 

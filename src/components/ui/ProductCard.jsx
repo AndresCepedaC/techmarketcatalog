@@ -1,20 +1,43 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+// [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
+import React, { useState, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import * as Lucide from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 
 const LEVITATE_CLASSES = ['animate-levitate-slow', 'animate-levitate-med', 'animate-levitate-fast'];
 
-const itemVariants = { hidden: { opacity: 0, y: 40, scale: 0.95 }, show: { opacity: 1, y: 0, scale: 1 } };
+const itemVariants = { 
+  hidden: { opacity: 0, y: 40, scale: 0.96 }, 
+  show: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 70, damping: 15, mass: 0.8 } } 
+};
 
 export function ProductCard({ product, index }) {
   const { setActiveProduct } = useStore();
   const [currentImg, setCurrentImg] = useState(0);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [shockwave, setShockwave] = useState(false);
+  const cardRef = useRef(null);
+  
+  // 3D Tilt Effect Values
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useTransform(y, [-100, 100], [4, -4]);
+  const rotateY = useTransform(x, [-100, 100], [-4, 4]);
   
   const fotos = product?.fotos || [`https://placehold.co/400x400/1C2039/00E5FF?text=${encodeURIComponent(product?.name || 'Tech')}`];
   const levitateClass = LEVITATE_CLASSES[index % 3];
+  
+  const handleMouseMove = (event) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    x.set(event.clientX - rect.left - rect.width / 2);
+    y.set(event.clientY - rect.top - rect.height / 2);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
   
   const handleNextImg = (e) => { e.stopPropagation(); setCurrentImg((prev) => (prev + 1) % fotos.length); };
   const handlePrevImg = (e) => { e.stopPropagation(); setCurrentImg((prev) => (prev - 1 + fotos.length) % fotos.length); };
@@ -31,13 +54,23 @@ export function ProductCard({ product, index }) {
 
   return (
     <motion.div 
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       variants={itemVariants} 
-      className={`group relative floating-island overflow-hidden cursor-pointer flex flex-col h-full ${levitateClass}`}
+      className={`group relative floating-island overflow-visible cursor-pointer flex flex-col h-full ${levitateClass}`}
       onClick={() => setActiveProduct(product)}
-      style={{ animationDelay: `${index * 0.3}s` }}
+      style={{ 
+        animationDelay: `${index * 0.3}s`,
+        rotateX,
+        rotateY,
+        transformStyle: 'preserve-3d',
+        perspective: '1000px',
+        willChange: 'transform'
+      }}
     >
       {/* Volumetric top light */}
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-quantum-cyan/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-quantum-cyan/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none rounded-t-3xl" />
       
       {/* Ambient glow on hover */}
       <div className="absolute -inset-2 bg-quantum-cyan/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none rounded-3xl" />
@@ -62,7 +95,7 @@ export function ProductCard({ product, index }) {
       )}
 
       {/* Product Image Area */}
-      <div className="relative aspect-square bg-quantum-deep/30 border-b border-white/5 overflow-hidden flex items-center justify-center">
+      <div className="relative aspect-square bg-quantum-deep/40 border-b border-white/5 overflow-hidden flex items-center justify-center rounded-t-3xl" style={{ transform: 'translateZ(20px)' }}>
         {fotos.length > 1 && (
           <>
             <button onClick={handlePrevImg} className="absolute left-3 z-30 p-2.5 glass-quantum text-quantum-cyan rounded-xl opacity-0 hover:bg-quantum-cyan hover:text-quantum-deep group-hover:opacity-100 transition-all shadow-neon-sm">
@@ -97,31 +130,33 @@ export function ProductCard({ product, index }) {
       </div>
 
       {/* Data Section */}
-      <div className="p-6 flex flex-col flex-1 relative z-10">
+      <div className="p-6 md:p-8 flex flex-col flex-1 relative z-10 bg-quantum-deep/40 rounded-b-[24px] backdrop-blur-md" style={{ transform: 'translateZ(30px)' }}>
         {/* Product Name */}
-        <h3 className="font-bold text-base text-white/90 mb-2 line-clamp-2 tracking-tight transition-all group-hover:text-white group-hover:text-glow-cyan">
+        <h3 className="font-black text-lg md:text-xl text-white mb-3 line-clamp-2 tracking-tight transition-all group-hover:text-quantum-cyan text-glow-cyan leading-snug">
           {product?.name}
         </h3>
         
         {/* Holographic spec readout */}
-        <div className="holo-data text-[10px] mb-5 line-clamp-2 leading-relaxed tracking-tight uppercase py-1">
+        <div className="holo-data text-[11px] mb-6 line-clamp-2 leading-relaxed tracking-widest uppercase text-quantum-cyan/60">
           {product?.specs ? Object.values(product.specs).join(" // ") : 'SPEC_NULL'}
         </div>
         
         {/* Price + Buy */}
-        <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
+        <div className="flex flex-col xl:flex-row xl:items-end justify-between mt-auto pt-5 border-t border-white/10 gap-4">
           <div className="flex flex-col">
-            <span className="text-[8px] uppercase text-quantum-cyan/30 font-black tracking-[0.3em] mb-1 holo-data">VALOR.COP</span>
-            <span className="text-2xl font-black text-white group-hover:text-quantum-cyan transition-all text-glow-cyan">
+            <span className="text-[9px] uppercase text-white/40 font-black tracking-[0.4em] mb-1.5 flex items-center gap-2">
+              <Lucide.Tag size={10} className="text-quantum-cyan" /> NET VALUE
+            </span>
+            <span className="text-3xl font-black text-white group-hover:text-quantum-purple transition-all text-glow-purple drop-shadow-[0_0_15px_rgba(157,0,255,0.4)]">
               ${product?.price?.toLocaleString('en-US')}
             </span>
           </div>
           
           <button 
             onClick={handleComprar} 
-            className={`neon-wave-btn h-12 px-7 rounded-xl text-quantum-cyan font-black text-[11px] uppercase tracking-[0.15em] ${shockwave ? 'animate-pulse' : ''}`}
+            className={`neon-wave-btn h-12 px-8 rounded-xl text-quantum-cyan font-black text-[12px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 ${shockwave ? 'animate-pulse' : ''}`}
           >
-            COMPRAR
+            <Lucide.ShoppingBag size={14} /> ADQUIRIR
           </button>
         </div>
       </div>

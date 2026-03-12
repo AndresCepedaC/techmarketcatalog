@@ -1,3 +1,4 @@
+// [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
 import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
@@ -13,8 +14,20 @@ import { Hero } from './components/layout/Hero';
 import { ProductGrid } from './components/ui/ProductGrid';
 import { ProductModal } from './components/ui/ProductModal';
 import { Chatbot } from './components/features/Chatbot';
+import { TrustSection } from './components/features/TrustSection';
 import { Footer } from './components/layout/Footer';
 import { ParticleField } from './components/ui/ParticleField';
+
+/**
+ * TECHMARKET UI SYSTEM
+ * 
+ * - Background Images: `public/photos/backgrounds/nebula_bg.png` is used for the Hero Parallax
+ *   background effect and the global body styling in `index.css`.
+ * - Logo Images: `public/photos/logo/logo.jpg` is used in the Header, Footer and Hero components.
+ *   `mix-blend-lighten` CSS is used to adapt it cleanly to the quantum dark theme.
+ * - Animations: Parallax scrolling relies on `framer-motion` (useScroll). Hover effects and Volumetric
+ *   glows are built with custom Keyframes and Tailwind CSS.
+ */
 
 function App() {
   useEffect(() => {
@@ -40,6 +53,7 @@ function App() {
         
         <main>
           <Hero />
+          <TrustSection />
           <div id="grid-start" className="scroll-mt-32" />
           <ProductGrid />
         </main>

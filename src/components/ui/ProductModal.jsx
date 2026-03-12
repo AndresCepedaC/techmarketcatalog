@@ -1,3 +1,4 @@
+// [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
@@ -21,14 +22,14 @@ export function ProductModal() {
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }} 
           exit={{ opacity: 0 }} 
-          className="absolute inset-0 bg-quantum-deep/95 backdrop-blur-3xl" 
+          className="absolute inset-0 bg-quantum-deep/80 backdrop-blur-3xl" 
           onClick={() => setActiveProduct(null)} 
         />
         <motion.div 
           initial={{ scale: 0.95, opacity: 0, y: 20 }} 
           animate={{ scale: 1, opacity: 1, y: 0 }} 
           exit={{ scale: 0.95, opacity: 0, y: 20 }} 
-          className="relative w-full max-w-6xl glass-quantum double-neon-cyan/30 rounded-3xl overflow-hidden flex flex-col md:flex-row z-10 shadow-neon-xl max-h-[90vh] md:max-h-none overflow-y-auto"
+          className="relative w-full max-w-6xl glass-quantum double-neon-cyan/30 rounded-3xl overflow-hidden flex flex-col md:flex-row z-10 shadow-neon-xl max-h-[90vh] md:max-h-none overflow-y-auto border border-quantum-cyan/20"
         >
           <button 
             onClick={() => setActiveProduct(null)} 
@@ -37,7 +38,7 @@ export function ProductModal() {
             <Lucide.X size={20} />
           </button>
 
-          <div className="w-full md:w-1/2 p-10 md:p-16 bg-quantum-deep/40 flex items-center justify-center min-h-[400px] md:min-h-[600px] relative">
+          <div className="w-full md:w-1/2 p-10 md:p-16 bg-quantum-deep/50 flex items-center justify-center min-h-[400px] md:min-h-[600px] relative border-r border-white/5">
             <div className="absolute inset-0 micro-circuitry opacity-[0.05]" />
             <ImageMagnifier 
               src={activeProduct?.fotos?.[0] || activeProduct?.image} 

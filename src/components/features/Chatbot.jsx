@@ -1,3 +1,4 @@
+// [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
@@ -138,7 +139,7 @@ export function Chatbot() {
             initial={{ y: 50, opacity: 0, scale: 0.95 }} 
             animate={{ y: 0, opacity: 1, scale: 1 }} 
             exit={{ y: 50, opacity: 0, scale: 0.95 }} 
-            className="fixed bottom-24 right-6 z-[110] w-[90vw] sm:w-[380px] h-[550px] glass-quantum double-neon-purple rounded-3xl shadow-neon-xl flex flex-col overflow-hidden"
+            className="fixed bottom-24 right-6 z-[110] w-[90vw] sm:w-[380px] h-[550px] glass-quantum double-neon-purple rounded-3xl shadow-neon-xl flex flex-col overflow-hidden border border-quantum-purple/30"
           >
             {/* Header */}
             <div className="p-6 border-b border-white/5 flex justify-between items-center bg-quantum-deep/40 backdrop-blur-md">

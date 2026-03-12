@@ -1,3 +1,4 @@
+// [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
 import React from 'react';
 
 export class ErrorBoundary extends React.Component {
@@ -17,20 +18,20 @@ export class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex items-center justify-center min-h-screen bg-brand-bg p-8 font-sans">
-          <div className="max-w-md w-full bg-brand-card border border-brand-pink/30 p-8 rounded-2xl shadow-2xl">
-            <h1 className="text-3xl font-black text-brand-pink mb-4 italic">⚠️ ERROR DETECTADO</h1>
-            <p className="text-gray-400 mb-6 leading-relaxed">
-              La aplicación ha encontrado un problema inesperado. Por favor, intenta recargar la página.
+        <div className="flex items-center justify-center min-h-screen bg-quantum-deep p-8 font-sans">
+          <div className="max-w-md w-full glass-quantum border border-quantum-cyan/30 p-8 rounded-3xl shadow-neon-xl">
+            <h1 className="text-3xl font-black text-quantum-cyan mb-4 italic text-3d-monumental">⚠️ ERROR DETECTADO</h1>
+            <p className="text-white/40 mb-6 leading-relaxed holo-data text-xs">
+              La aplicación ha encontrado un problema de sincronización. Por favor, intenta reiniciar el enlace.
             </p>
-            <div className="bg-black/40 p-4 rounded-xl border border-white/5 mb-8 overflow-x-auto">
-              <pre className="text-xs text-brand-pink font-mono">
+            <div className="bg-quantum-deep/80 p-4 rounded-xl border border-quantum-cyan/10 mb-8 overflow-x-auto">
+              <pre className="text-[10px] text-quantum-cyan font-mono tracking-widest">
                 {this.state.error?.toString()}
               </pre>
             </div>
             <button 
               onClick={() => window.location.reload()} 
-              className="w-full py-4 bg-brand-pink text-white font-black rounded-xl hover:bg-white hover:text-brand-pink transition-all shadow-[0_10px_20px_rgba(255,45,149,0.3)]"
+              className="w-full py-4 neon-wave-btn text-quantum-cyan font-black rounded-xl transition-all shadow-neon-md tracking-[0.2em] text-xs uppercase"
             >
               REINTENTAR CARGA
             </button>

@@ -1,3 +1,4 @@
+// [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import * as Lucide from 'lucide-react';
@@ -5,7 +6,13 @@ import { useStore } from '../../context/StoreContext';
 import { ProductCard } from './ProductCard';
 import { CategoryFilters } from './CategoryFilters';
 
-const containerVariants = { show: { transition: { staggerChildren: 0.15 } } };
+const containerVariants = { 
+  hidden: { opacity: 0 },
+  show: { 
+    opacity: 1, 
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 } 
+  } 
+};
 
 export function ProductGrid() {
   const { searchQuery, selectedCategory } = useStore();
@@ -51,30 +58,47 @@ export function ProductGrid() {
       <CategoryFilters />
       
       {/* 3D Perspective Container */}
-      <div className="flex flex-col gap-32 perspective-deep">
+      <div className="flex flex-col gap-40 perspective-deep">
         {categoriesToRender.length > 0 ? (
-          categoriesToRender.map(cat => (
-            <div key={cat} className="flex flex-col gap-14">
-              {/* Category Megatray Header */}
-              <div className="flex items-center gap-8 group">
-                <div className="flex flex-col relative">
-                  <span className="text-[10px] font-black uppercase tracking-[0.5em] text-quantum-cyan/40 mb-2 holo-data">
-                    SECTOR // 0{categoriesToRender.indexOf(cat) + 1}
-                  </span>
-                  <h2 className="text-4xl md:text-6xl font-black quantum-gradient-text uppercase tracking-tighter leading-none text-glow-cyan">
-                    {cat}
-                  </h2>
-                  {/* Neon megatray underline */}
-                  <div className="absolute -bottom-3 left-0 w-full h-[2px] bg-gradient-to-r from-quantum-cyan/40 via-quantum-purple/20 to-transparent" />
+          categoriesToRender.map((cat, idx) => {
+            // Alternate ambient gradients between categories for mini-world feel
+            const isEven = idx % 2 === 0;
+            const bgGradient = isEven 
+              ? 'bg-gradient-to-br from-quantum-cyan/5 via-transparent to-quantum-purple/5'
+              : 'bg-gradient-to-tr from-quantum-purple/5 via-transparent to-quantum-cyan/5';
+
+            return (
+              <div key={cat} className={`relative flex flex-col gap-16 p-8 md:p-12 rounded-[40px] border border-white/5 ${bgGradient} overflow-hidden group/cat transition-all duration-700 hover:border-quantum-cyan/20`}>
+                
+                {/* Immersive Category Background Blur */}
+                <div className="absolute inset-0 bg-quantum-deep/40 backdrop-blur-xl -z-10" />
+                <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-quantum-cyan/10 blur-[120px] rounded-full pointer-events-none -z-10 opacity-50 group-hover/cat:opacity-100 transition-opacity duration-1000" />
+                <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-quantum-purple/10 blur-[120px] rounded-full pointer-events-none -z-10 opacity-50 group-hover/cat:opacity-100 transition-opacity duration-1000" />
+
+                {/* Category Megatray Header */}
+                <div className="flex flex-col md:flex-row md:items-end gap-6 md:gap-12 relative z-10">
+                  <div className="flex flex-col relative">
+                    <div className="inline-flex items-center gap-3 mb-4">
+                      <span className="w-1.5 h-1.5 rounded-full bg-quantum-cyan animate-pulse" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.5em] text-quantum-cyan/60 holo-data">
+                        SECTOR // 0{idx + 1}
+                      </span>
+                    </div>
+                    <h2 className="text-5xl md:text-7xl font-black text-white uppercase tracking-tighter leading-none text-glow-cyan mix-blend-lighten drop-shadow-[0_0_30px_rgba(0,245,255,0.2)]">
+                      {cat}
+                    </h2>
+                  </div>
+                  <div className="h-[2px] flex-1 bg-gradient-to-r from-quantum-cyan/40 via-quantum-purple/20 to-transparent mt-4 md:mb-4 relative overflow-hidden">
+                     <div className="absolute inset-0 w-1/3 h-full bg-white/40 blur-[2px] animate-data-stream" style={{ animationDuration: '3s' }} />
+                  </div>
                 </div>
-                <div className="h-px flex-1 bg-gradient-to-r from-quantum-cyan/10 via-quantum-purple/5 to-transparent mt-8" />
-              </div>
 
               {/* Floating Products Grid */}
               <motion.div 
                 variants={containerVariants} 
                 initial="hidden" 
-                animate="show" 
+                whileInView="show" 
+                viewport={{ once: true, amount: 0.1 }}
                 className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10 preserve-3d"
               >
                 {filtered.filter(p => p.category === cat).map((p, idx) => (
@@ -82,7 +106,8 @@ export function ProductGrid() {
                 ))}
               </motion.div>
             </div>
-          ))
+            );
+          })
         ) : (
           <div className="py-32 text-center floating-island max-w-2xl mx-auto p-12">
             <Lucide.Zap size={56} className="mx-auto mb-6 text-quantum-cyan/20 animate-pulse volumetric-glow" />

@@ -1,0 +1,117 @@
+{
+  "brand": "TechMarket",
+  "version": "2.0.0",
+  "colors": {
+    "primary": {
+      "hex": "#00F5FF",
+      "name": "Quantum Cyan",
+      "usage": "Neon glows, primary CTA, active states, energy accents"
+    },
+    "secondary": {
+      "hex": "#9D00FF",
+      "name": "Nebula Purple",
+      "usage": "Ambient low-light glows, secondary accents, deep gradients"
+    },
+    "background": {
+      "hex": "#010208",
+      "name": "Deep Space Abyss",
+      "usage": "Main body background, infinite void simulation"
+    },
+    "surface": {
+      "hex": "#0B1D29",
+      "name": "Frosted Orbital Panel",
+      "usage": "Card backgrounds, floating islands, interactive surfaces",
+      "opacityScaling": [0.4, 0.6, 0.8]
+    },
+    "onBackground": {
+      "hex": "#FFFFFF",
+      "name": "Starlight White",
+      "usage": "Main headings, high-contrast text"
+    },
+    "onSurface": {
+      "hex": "#EBFFFF",
+      "name": "Cyan-tinted White",
+      "opacity": 0.82,
+      "usage": "Body text, secondary information"
+    },
+    "muted": {
+      "hex": "#00F5FF",
+      "name": "Faded Cyan",
+      "opacity": 0.5,
+      "usage": "Disabled states, borders, ultra-subtle text"
+    },
+    "danger": {
+      "hex": "#FF2A5F",
+      "name": "Critical Red",
+      "usage": "Error states, destructive actions"
+    },
+    "success": {
+      "hex": "#00FF9D",
+      "name": "System Green",
+      "usage": "Success messages, verified badges"
+    }
+  },
+  "gradients": {
+    "cyberHolo": "linear-gradient(135deg, rgba(0, 245, 255, 0.2), transparent 40%, transparent 60%, rgba(157, 0, 255, 0.15))",
+    "surfacePanel": "linear-gradient(145deg, rgba(11, 29, 41, 0.6), rgba(2, 4, 10, 0.8))",
+    "energyLine": "linear-gradient(to right, #00F5FF, #9D00FF, transparent)",
+    "voidFade": "linear-gradient(to bottom, rgba(2, 4, 10, 0.6), transparent)"
+  },
+  "depth": {
+    "elevation1": "0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.05)",
+    "elevation2": "0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 245, 255, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.06)",
+    "elevation3": "0 30px 90px rgba(0, 0, 0, 0.8), 0 0 60px rgba(0, 245, 255, 0.1), inset 0 2px 2px rgba(255, 255, 255, 0.1)"
+  },
+  "glow": {
+    "cyanSoft": "0 0 10px rgba(0, 245, 255, 0.4), 0 0 30px rgba(0, 245, 255, 0.2)",
+    "cyanIntense": "0 0 15px rgba(0, 245, 255, 0.6), 0 0 40px rgba(0, 245, 255, 0.3), 0 0 80px rgba(0, 245, 255, 0.15)",
+    "purpleSoft": "0 0 10px rgba(157, 0, 255, 0.4), 0 0 30px rgba(157, 0, 255, 0.2)",
+    "monumentalText": "0 1px 0 rgba(0, 245, 255, 0.4), 0 0 40px rgba(0, 245, 255, 0.15)"
+  },
+  "typography": {
+    "display": {
+      "family": "'Outfit', sans-serif",
+      "weights": [700, 800, 900],
+      "usage": "Hero titles, monumental section headers"
+    },
+    "body": {
+      "family": "'Inter', sans-serif",
+      "weights": [300, 400, 500],
+      "usage": "Paragraphs, long-form content, ui labels"
+    },
+    "mono": {
+      "family": "'JetBrains Mono', 'Fira Code', monospace",
+      "weights": [400, 700],
+      "usage": "Spec readouts, holographic data feeds, serial numbers"
+    }
+  },
+  "shapes": {
+    "radius": {
+      "sm": "8px",
+      "md": "12px",
+      "lg": "24px",
+      "pill": "9999px"
+    },
+    "borders": {
+      "hairline": "1px solid rgba(255, 255, 255, 0.05)",
+      "neonCyan": "1px solid rgba(0, 245, 255, 0.3)",
+      "neonPurple": "1px solid rgba(157, 0, 255, 0.3)"
+    }
+  },
+  "motion": {
+    "durations": {
+      "fast": "150ms",
+      "base": "300ms",
+      "slow": "600ms",
+      "glacial": "1200ms"
+    },
+    "easings": {
+      "cyberSnappy": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "smoothFloat": "cubic-bezier(0.4, 0, 0.2, 1)"
+    }
+  },
+  "textures": {
+    "microCircuitry": "radial-gradient(#00F5FF 0.5px, transparent 0.5px) size 30px 30px",
+    "glassBlur": "blur(40px) saturate(1.5)"
+  }
+}

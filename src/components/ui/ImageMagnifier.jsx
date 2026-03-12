@@ -1,3 +1,4 @@
+// [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
 import React, { useState } from 'react';
 
 export function ImageMagnifier({ src, alt }) {
@@ -12,7 +13,7 @@ export function ImageMagnifier({ src, alt }) {
 
   return (
     <div 
-      className="relative w-full h-full bg-dark-900 rounded-xl overflow-hidden cursor-crosshair flex items-center justify-center border border-white/5 shadow-2xl" 
+      className="relative w-full h-full bg-quantum-deep/80 rounded-xl overflow-hidden cursor-crosshair flex items-center justify-center border border-white/5 shadow-2xl shadow-neon-sm" 
       onMouseMove={handleMove} 
       onMouseLeave={() => setZoom({ ...zoom, show: false })}
     >

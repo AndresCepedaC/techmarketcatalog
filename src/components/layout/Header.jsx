@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
+// [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 
 export function Header() {
   const { searchQuery, setSearchQuery } = useStore();
+  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 bg-quantum-deep/80 backdrop-blur-3xl border-b border-quantum-cyan/10 overflow-hidden">
+    <header className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 overflow-hidden ${scrolled ? 'bg-quantum-deep/80 backdrop-blur-3xl border-b border-quantum-cyan/10 shadow-neon-md' : 'bg-transparent border-transparent'}`}>
       {/* Colossal blurred background logo */}
       <div className="absolute inset-x-0 top-0 h-full pointer-events-none opacity-20 overflow-hidden">
         <img 
-          src="/photos/logo/logo.png" 
+          src="/photos/logo/logo.jpg" 
           alt="" 
-          className="absolute -top-1/2 left-1/2 -translate-x-1/2 w-[800px] max-w-none opacity-40 blur-[100px] logo-etched"
+          className="absolute -top-1/2 left-1/2 -translate-x-1/2 w-[800px] max-w-none opacity-20 blur-[100px] logo-etched mix-blend-lighten"
         />
         <div className="absolute inset-0 star-field opacity-30" />
       </div>
@@ -31,10 +41,12 @@ export function Header() {
           </button>
           
           <div className="flex items-center cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <img 
-              src="/photos/logo/logo.png" 
+            <motion.img 
+              animate={{ y: [0, -6, 0] }}
+              transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+              src="/photos/logo/logo.jpg" 
               alt="Tech Market" 
-              className="h-10 md:h-14 w-auto object-contain transition-all duration-300 logo-etched group-hover:drop-shadow-[0_0_25px_rgba(0,245,255,0.6)]"
+              className="h-10 md:h-14 w-auto object-contain transition-all duration-300 logo-etched group-hover:drop-shadow-[0_0_25px_rgba(0,245,255,0.6)] mix-blend-lighten rounded-xl"
             />
           </div>
         </div>
