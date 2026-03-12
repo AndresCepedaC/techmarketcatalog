@@ -110,14 +110,15 @@ export function Chatbot() {
                initial={{ opacity: 0, scale: 0.8, x: 20 }} 
                animate={{ opacity: 1, scale: 1, x: 0 }} 
                exit={{ opacity: 0, scale: 0.8 }}
-               className="bg-brand-card border border-brand-cyan/30 p-4 rounded-2xl shadow-2xl max-w-[200px]"
+               className="glass-quantum double-neon-purple/50 p-5 rounded-2xl shadow-neon-xl max-w-[220px] relative overflow-hidden"
             >
-              <p className="text-[11px] font-bold text-gray-200">¡Hola! Soy Aura. ¿Necesitas ayuda buscando algo?</p>
+              <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-quantum-cyan to-quantum-purple opacity-50" />
+              <p className="text-[11px] font-black text-white/90 leading-relaxed uppercase tracking-wider">¡Hola! Soy Aura. ¿Necesitas ayuda buscando algo?</p>
               <button 
                 onClick={() => setShowInvite(false)}
-                className="absolute -top-2 -left-2 bg-dark-900 border border-white/10 rounded-full p-1 text-gray-400 hover:text-white"
+                className="absolute top-2 right-2 text-quantum-cyan/50 hover:text-white transition-colors"
               >
-                <Lucide.X size={10} />
+                <Lucide.X size={12} />
               </button>
             </motion.div>
           )}
@@ -125,50 +126,57 @@ export function Chatbot() {
         
         <button 
           onClick={toggleChat} 
-          className={`w-16 h-16 rounded-full bg-gradient-to-br from-brand-cyan to-brand-purple flex items-center justify-center shadow-2xl transition-transform hover:scale-110 active:scale-95 ${!isOpen && 'animate-pulse shadow-brand-cyan/20'}`}
+          className={`w-14 h-14 rounded-xl glass-quantum double-neon-cyan flex items-center justify-center shadow-neon-md transition-all hover:scale-110 active:scale-95 group ${!isOpen && 'animate-neon-pulse'}`}
         >
-          {isOpen ? <Lucide.X size={28} className="text-white" /> : <Lucide.Bot size={28} className="text-white" />}
+          {isOpen ? <Lucide.X size={24} className="text-quantum-cyan transition-transform group-hover:rotate-90" /> : <Lucide.Bot size={24} className="text-quantum-cyan" />}
         </button>
       </div>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div 
-            initial={{ y: 100, opacity: 0, scale: 0.9 }} 
+            initial={{ y: 50, opacity: 0, scale: 0.95 }} 
             animate={{ y: 0, opacity: 1, scale: 1 }} 
-            exit={{ y: 100, opacity: 0, scale: 0.9 }} 
-            className="fixed bottom-24 right-6 z-[110] w-[90vw] sm:w-[380px] h-[550px] bg-brand-card border border-white/10 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] flex flex-col overflow-hidden"
+            exit={{ y: 50, opacity: 0, scale: 0.95 }} 
+            className="fixed bottom-24 right-6 z-[110] w-[90vw] sm:w-[380px] h-[550px] glass-quantum double-neon-purple rounded-3xl shadow-neon-xl flex flex-col overflow-hidden"
           >
-            <div className="p-5 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-brand-cyan/10 to-transparent">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-brand-cyan/20 rounded-lg text-brand-cyan"><Lucide.Bot size={20} /></div>
+            {/* Header */}
+            <div className="p-6 border-b border-white/5 flex justify-between items-center bg-quantum-deep/40 backdrop-blur-md">
+              <div className="flex items-center gap-4">
+                <div className="p-2.5 bg-quantum-cyan/10 rounded-xl text-quantum-cyan border border-quantum-cyan/20 shadow-neon-sm">
+                  <Lucide.Cpu size={20} className="animate-pulse" />
+                </div>
                 <div>
-                  <h4 className="font-black text-sm text-white uppercase tracking-widest">Aura AI</h4>
-                  <p className="text-[10px] text-brand-cyan font-bold tracking-[0.2em] uppercase">Especialista Tech</p>
+                  <h4 className="font-black text-[11px] text-white uppercase tracking-[0.3em]">Aura Intel</h4>
+                  <p className="text-[9px] text-quantum-purple font-black tracking-[0.2em] uppercase">Módulo de Asistencia</p>
                 </div>
               </div>
+              <button onClick={() => setIsOpen(false)} className="text-white/20 hover:text-white transition-colors">
+                <Lucide.X size={18} />
+              </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-5 space-y-5 scrollbar-thin">
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide micro-circuitry bg-[length:20px_20px]">
               {msgs.length === 0 && (
-                <div className="text-center py-10 opacity-50">
-                  <Lucide.MessageSquare size={40} className="mx-auto mb-4 text-brand-cyan" />
-                  <p className="text-xs font-bold uppercase tracking-widest">Inicia una conversación</p>
+                <div className="text-center py-20 opacity-30">
+                  <Lucide.Zap size={40} className="mx-auto mb-5 text-quantum-cyan animate-pulse" />
+                  <p className="text-[9px] font-black uppercase tracking-[0.4em]">Sincronización Lista</p>
                 </div>
               )}
               {msgs.map((m, i) => (
                 <div key={i} className={`flex ${m.r === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`p-4 text-[13px] leading-relaxed rounded-2xl max-w-[85%] ${
+                  <div className={`p-4 text-[12.5px] leading-relaxed rounded-2xl max-w-[85%] font-medium transition-all ${
                     m.r === 'user' 
-                      ? 'bg-brand-cyan text-dark-900 font-bold' 
+                      ? 'bg-quantum-cyan text-quantum-deep shadow-neon-sm font-black' 
                       : m.r === 'error'
-                        ? 'bg-brand-pink/10 border border-brand-pink/30 text-brand-pink'
-                        : 'bg-white/5 text-gray-200 border border-white/5'
+                        ? 'bg-red-500/10 border border-red-500/30 text-red-500 text-[11px]'
+                        : 'glass-quantum border-white/10 text-white/90 shadow-sm'
                   }`}>
                     {m.t}
                     {m.r === 'error' && (
-                       <a href={WHATSAPP_LINK} target="_blank" className="mt-3 flex items-center gap-2 text-[10px] font-black uppercase text-white bg-[#25D366] px-3 py-2 rounded-lg justify-center transition-opacity hover:opacity-90">
-                         <Lucide.MessageCircle size={14} /> Ir a WhatsApp
+                       <a href={WHATSAPP_LINK} target="_blank" className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase text-white bg-green-500/20 border border-green-500/40 px-3 py-2.5 rounded-xl justify-center transition-all hover:bg-green-500/30">
+                         <Lucide.MessageCircle size={14} /> Canal de WhatsApp
                        </a>
                     )}
                   </div>
@@ -176,32 +184,34 @@ export function Chatbot() {
               ))}
               {typing && (
                 <div className="flex justify-start">
-                  <div className="p-4 bg-white/5 rounded-2xl flex gap-1.5 items-center">
-                    <span className="w-1.5 h-1.5 bg-brand-cyan rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 bg-brand-cyan rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 bg-brand-cyan rounded-full animate-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <div className="px-5 py-4 glass-quantum border-white/5 rounded-2xl flex gap-2 items-center">
+                    <span className="w-1.5 h-1.5 bg-quantum-cyan rounded-full animate-bounce shadow-neon-sm" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 bg-quantum-cyan rounded-full animate-bounce shadow-neon-sm" style={{ animationDelay: '200ms' }} />
+                    <span className="w-1.5 h-1.5 bg-quantum-cyan rounded-full animate-bounce shadow-neon-sm" style={{ animationDelay: '400ms' }} />
                   </div>
                 </div>
               )}
               <div ref={endRef} />
             </div>
 
-            <div className="p-4 border-t border-white/5 bg-black/20">
+            {/* Input */}
+            <div className="p-5 border-t border-white/5 bg-quantum-deep/60">
               <div className="relative group">
                 <input 
                   value={input} 
                   onChange={e => setInput(e.target.value)} 
                   onKeyDown={e => e.key === 'Enter' && handleSend()} 
-                  placeholder="Escribe tu mensaje..." 
-                  className="w-full bg-dark-900 border border-white/10 rounded-xl px-4 py-4 text-sm focus:outline-none focus:border-brand-cyan/50 focus:shadow-[0_0_15px_rgba(0,229,255,0.05)] transition-all" 
+                  placeholder="Inicia protocolo de consulta..." 
+                  className="w-full glass-quantum border-white/10 rounded-2xl pl-5 pr-14 py-4 text-sm text-white placeholder-quantum-cyan/20 focus:outline-none focus:border-quantum-cyan/30 focus:shadow-neon-sm transition-all" 
                 />
                 <button 
                   onClick={handleSend} 
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-brand-cyan hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 text-quantum-cyan hover:text-white transition-all transform hover:scale-110 active:scale-95"
                 >
-                  <Lucide.Send size={18} />
+                  <Lucide.Zap size={20} className="fill-current" />
                 </button>
               </div>
+              <p className="text-[9px] text-center text-white/20 mt-3 font-mono tracking-widest uppercase">Protocolo Aura v3.3.70b</p>
             </div>
           </motion.div>
         )}

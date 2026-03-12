@@ -1,28 +1,56 @@
 import React from 'react';
 import { useStore } from '../../context/StoreContext';
 
-const CATS = ["Todos", "Intercomunicadores", "Periféricos", "Accesorios", "Audio", "Smart Home", "Software"];
+const NAV_ITEMS = [
+  { label: "Inicio", category: "Todos" },
+  { label: "Intercomunicadores", category: "Intercomunicadores" },
+  { label: "Periféricos", category: "Periféricos" },
+  { label: "Audio", category: "Audio" },
+  { label: "Smart Home", category: "Smart Home" },
+  { label: "Accesorios", category: "Accesorios" },
+  { label: "Software", category: "Software" },
+  { label: "Novedades", category: null, href: "#catalog" },
+  { label: "Soporte", category: null, href: "https://wa.me/573005054912" },
+];
 
 export function CategoryFilters() {
   const { selectedCategory, setSelectedCategory } = useStore();
   
   return (
-    <div className="flex overflow-x-auto gap-3 pb-4 mb-6 scrollbar-hide">
-      {CATS.map(cat => {
-        const active = selectedCategory === cat;
-        return (
-          <button
-            key={cat} 
-            onClick={() => setSelectedCategory(cat)}
-            className={`whitespace-nowrap px-5 py-2 rounded-full text-[13px] font-bold transition-all duration-300 border ${active
-              ? 'bg-brand-cyan/10 text-brand-cyan border-brand-cyan shadow-[0_0_15px_rgba(0,229,255,0.2)]'
-              : 'bg-dark-800 text-gray-400 border-white/[0.06] hover:bg-dark-700 hover:text-white hover:border-white/20'
+    <nav className="border-b border-white/5 mb-16">
+      <div className="flex overflow-x-auto gap-0 scrollbar-hide">
+        {NAV_ITEMS.map(item => {
+          const isActive = item.category && selectedCategory === item.category;
+          const isExternal = item.href && item.href.startsWith('http');
+          
+          if (item.category === null) {
+            return (
+              <a
+                key={item.label}
+                href={item.href}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                className="whitespace-nowrap px-6 py-4 text-[13px] font-bold tracking-wide text-white/30 hover:text-quantum-cyan transition-all duration-300 border-b-2 border-transparent hover:border-quantum-cyan/30"
+              >
+                {item.label}
+              </a>
+            );
+          }
+          
+          return (
+            <button
+              key={item.label}
+              onClick={() => setSelectedCategory(item.category)}
+              className={`whitespace-nowrap px-6 py-4 text-[13px] font-bold tracking-wide transition-all duration-300 border-b-2 ${isActive
+                ? 'text-quantum-cyan border-quantum-cyan text-glow-cyan'
+                : 'text-white/40 border-transparent hover:text-white/70 hover:border-quantum-cyan/20'
               }`}
-          >
-            {cat}
-          </button>
-        );
-      })}
-    </div>
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+    </nav>
   );
 }

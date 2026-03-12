@@ -8,61 +8,71 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-dark-900/80 backdrop-blur-xl border-b border-white/5">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 md:h-24 flex items-center justify-between gap-8">
+    <header className="sticky top-0 z-50 bg-quantum-deep/80 backdrop-blur-3xl border-b border-quantum-cyan/10 overflow-hidden">
+      {/* Colossal blurred background logo */}
+      <div className="absolute inset-x-0 top-0 h-full pointer-events-none opacity-20 overflow-hidden">
+        <img 
+          src="/photos/logo/logo.png" 
+          alt="" 
+          className="absolute -top-1/2 left-1/2 -translate-x-1/2 w-[800px] max-w-none opacity-40 blur-[100px] logo-etched"
+        />
+        <div className="absolute inset-0 star-field opacity-30" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 md:h-24 flex items-center justify-between gap-8 relative z-10">
         
-        {/* Logo Section */}
+        {/* Logo Section - Etched into background */}
         <div className="flex items-center gap-4">
           <button 
-            className="lg:hidden p-2 text-gray-400 hover:text-brand-cyan transition-all" 
+            className="lg:hidden p-2 text-quantum-cyan hover:text-white transition-all" 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <Lucide.X size={24} /> : <Lucide.Menu size={24} />}
           </button>
           
           <div className="flex items-center cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="relative flex items-center gap-3">
-              <div className="relative">
-                <Lucide.Zap size={32} className="text-brand-cyan relative z-10 filter drop-shadow-[0_0_10px_rgba(0,229,255,0.8)]" />
-                <motion.div 
-                  animate={{ scale: [1, 1.4, 1], opacity: [0.2, 0.5, 0.2] }}
-                  transition={{ duration: 2.5, repeat: Infinity }}
-                  className="absolute inset-0 bg-brand-cyan rounded-full blur-lg"
-                />
-              </div>
-              <span className="text-2xl md:text-3xl font-black tracking-tighter text-white">
-                TECH<span className="text-brand-cyan">MARKET</span>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Search Bar Desktop */}
-        <div className="hidden lg:block flex-1 max-w-xl">
-          <div className="relative group">
-            <Lucide.Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-brand-cyan transition-colors" />
-            <input
-              type="text" 
-              placeholder="¿Qué estás buscando hoy?" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-6 py-3.5 bg-white/5 border border-white/10 rounded-2xl text-[15px] text-white placeholder-gray-500 focus:outline-none focus:border-brand-cyan/40 focus:bg-white/10 focus:shadow-[0_0_25px_rgba(0,229,255,0.1)] transition-all duration-300"
+            <img 
+              src="/photos/logo/logo.png" 
+              alt="Tech Market" 
+              className="h-10 md:h-14 w-auto object-contain transition-all duration-300 logo-etched group-hover:drop-shadow-[0_0_25px_rgba(0,245,255,0.6)]"
             />
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2">
-          <button className="hidden sm:flex items-center gap-2 px-5 py-3 text-sm font-black text-white hover:text-brand-cyan transition-all border border-white/5 hover:border-brand-cyan/20 rounded-xl bg-white/5">
-            <Lucide.User size={18} />
-            <span className="uppercase tracking-widest text-[10px]">Cuenta</span>
-          </button>
-          <button 
-            onClick={() => document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' })}
-            className="p-3 bg-brand-cyan text-dark-900 rounded-xl hover:bg-white transition-all shadow-[0_10px_20px_rgba(0,229,255,0.2)]"
-          >
-            <Lucide.ShoppingBag size={20} />
-          </button>
+        {/* Search Bar Desktop - Double Neon Frame */}
+        <div className="hidden lg:block flex-1 max-w-xl">
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-quantum-cyan/20 to-quantum-purple/20 rounded-2xl blur opacity-0 group-focus-within:opacity-100 transition duration-500" />
+            <div className="relative flex items-center bg-quantum-deep/40 rounded-2xl double-neon-cyan">
+              <Lucide.Search size={18} className="ml-4 text-quantum-cyan/50 group-focus-within:text-quantum-cyan transition-colors" />
+              <input
+                type="text" 
+                placeholder="¿Qué estás buscando hoy?" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-3 pr-6 py-3.5 bg-transparent text-[15px] text-white placeholder-quantum-cyan/30 focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons - Geometric Pods */}
+        <div className="flex items-center gap-4">
+          <div className="hidden sm:flex items-center p-0.5 rounded-xl double-neon-cyan/50 bg-quantum-glass">
+            <button className="flex items-center gap-2 px-6 py-2.5 text-sm font-black text-quantum-cyan hover:text-white transition-all rounded-lg hover:bg-quantum-cyan/10">
+              <Lucide.User size={18} />
+              <span className="uppercase tracking-[0.2em] text-[10px]">Cuenta</span>
+            </button>
+          </div>
+
+          <div className="flex items-center p-0.5 rounded-xl double-neon-cyan bg-quantum-cyan/10 shadow-neon-sm hover:shadow-neon-md transition-all">
+            <button 
+              onClick={() => document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' })}
+              className="p-3.5 bg-quantum-cyan text-quantum-deep rounded-lg hover:bg-white transition-all active:scale-95"
+            >
+              <Lucide.ShoppingBag size={20} />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -73,23 +83,23 @@ export function Header() {
             initial={{ height: 0, opacity: 0 }} 
             animate={{ height: 'auto', opacity: 1 }} 
             exit={{ height: 0, opacity: 0 }} 
-            className="lg:hidden overflow-hidden border-t border-white/5 bg-dark-800"
+            className="lg:hidden overflow-hidden border-t border-white/5 bg-quantum-deep/95 backdrop-blur-3xl"
           >
             <div className="p-6 space-y-6">
               <div className="relative">
-                <Lucide.Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                <Lucide.Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-quantum-cyan/40" />
                 <input
                   type="text" 
                   placeholder="Buscar en el catálogo..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-6 py-4 bg-dark-900 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:border-brand-cyan/40"
+                  className="w-full pl-12 pr-6 py-4 glass-quantum border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:border-quantum-cyan/30"
                 />
               </div>
               <nav className="flex flex-col gap-4 py-2">
-                <a href="#catalog" onClick={() => setMobileMenuOpen(false)} className="text-xl font-black text-white hover:text-brand-cyan transition-colors">Catálogo</a>
-                <a href="#" className="text-xl font-black text-white hover:text-brand-cyan transition-colors">Ofertas</a>
-                <a href="#" className="text-xl font-black text-white hover:text-brand-cyan transition-colors">Contacto</a>
+                <a href="#catalog" onClick={() => setMobileMenuOpen(false)} className="text-xl font-black text-white hover:text-quantum-cyan transition-colors">Catálogo</a>
+                <a href="#" className="text-xl font-black text-white hover:text-quantum-cyan transition-colors">Ofertas</a>
+                <a href="https://wa.me/573005054912" target="_blank" className="text-xl font-black text-white hover:text-quantum-cyan transition-colors">Contacto</a>
               </nav>
             </div>
           </motion.div>

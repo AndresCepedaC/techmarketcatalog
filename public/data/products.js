@@ -1,70 +1,95 @@
 /**
  * ╔══════════════════════════════════════════╗
- * ║   TECH MARKET V3 – Datos Estrictos       ║
+ * ║   SETUP PRO – Ciber-Gótico Neón Catalog  ║
  * ╠══════════════════════════════════════════╣
- * ║  Nuevos productos de Nicho (Periféricos, ║
- * ║  Smart Home, Licencias, etc.)            ║
+ * ║  Productos exactos, precios definitivos  ║
  * ╚══════════════════════════════════════════╝
  */
 
 const mockProducts = [
-    // 🏍️ Nueva Categoría: Intercomunicadores
+    // 🎧 Intercomunicadores
     {
-        id: "101", name: "Intercomunicador K06A", price: 40000, category: "Intercomunicadores", isPromo: true,
+        id: "101", name: "Intercomunicador DOBA K06A", price: 148000, category: "Intercomunicadores", isPromo: true,
         descripcion: "Comunicación inalámbrica entre pilotos en tiempo real con Bluetooth 5.0 y resistencia IPX6. Ideal para recorridos urbanos en moto bajo cualquier clima.",
-        fotos: ["/photos/intercoms.webp", "https://placehold.co/400x400/1C2039/B026FF?text=K06A+Lateral", "https://placehold.co/400x400/1C2039/FF2D95?text=K06A+Accesorios"],
-        specs: { "Conectividad": "Bluetooth 5.0", "Batería": "500mAh (Garantizado)", "Resistencia": "IPX6 (Lluvia)", "Perfil": "Motociclismo Urbano" }
+        fotos: ["/photos/intercoms.webp"],
+        specs: { "Conectividad": "Bluetooth 5.0", "Batería": "500mAh", "Resistencia": "IPX6", "Perfil": "Urbano" }
     },
     {
-        id: "102", name: "Intercomunicador Y30A", price: 45000, category: "Intercomunicadores", isPromo: false,
+        id: "102", name: "Intercomunicador Headset X", price: 140000, category: "Intercomunicadores", isPromo: false,
         descripcion: "Intercom para 2 riders con alcance de hasta 1000 metros y cancelación de ruido DSP. Perfecto para rutas largas en carretera con acompañante.",
-        fotos: ["/photos/intercoms.webp", "https://placehold.co/400x400/1C2039/B026FF?text=Y30A+Casco", "https://placehold.co/400x400/1C2039/FF2D95?text=Y30A+Caja"],
-        specs: { "Rango": "Hasta 1000m", "Intercom múltiple": "Sí (2 Riders)", "Cancelación de Ruido": "DSP Avanzado", "Resistencia": "IP67" }
+        fotos: ["/photos/intercoms.webp"],
+        specs: { "Rango": "Hasta 1000m", "Intercom": "2 Riders", "Cancelación": "DSP", "Resistencia": "IP67" }
     },
     {
-        id: "103", name: "Intercomunicador Q58", price: 85000, category: "Intercomunicadores", isPromo: true,
+        id: "103", name: "BIntercom 300 5H", price: 148000, category: "Intercomunicadores", isPromo: false,
         descripcion: "Audio Hi-Fi estéreo con chip Qualcomm Dual y batería de 1000mAh para jornadas largas. Ideal para grupos que comparten música en ruta.",
-        fotos: ["/photos/intercoms.webp", "https://placehold.co/400x400/1C2039/B026FF?text=Q58+Microfono", "https://placehold.co/400x400/1C2039/FF2D95?text=Q58+Instalado"],
-        specs: { "Batería": "1000mAh Larga duración", "Chip": "Qualcomm Dual", "Música Compartida": "Soportado", "Audio": "Hi-Fi Estéreo" }
+        fotos: ["/photos/intercoms.webp"],
+        specs: { "Batería": "1000mAh", "Chip": "Qualcomm Dual", "Audio": "Hi-Fi Estéreo", "Música": "Compartida" }
     },
 
-    // 🖱️ Periféricos y Accesorios
+    // 🖱️ Periféricos
     {
-        id: "1", name: "Mouse Gamer Logitech G304", price: 80000, category: "Periféricos",
-        descripcion: "Sensor Hero de 12.000 DPI con conexión inalámbrica ultrarrápida y diseño liviano. Perfecto para gaming competitivo o trabajo prolongado sin cables.",
-        fotos: ["https://placehold.co/400x400/1C2039/00E5FF?text=G304+Front", "https://placehold.co/400x400/1C2039/B026FF?text=G304+Side"], isPromo: true, specs: { "Sensor": "Hero", "DPI": "12.000" }
+        id: "1", name: "Ratón Mecánico RGB M0", price: 86000, category: "Periféricos", isPromo: true,
+        descripcion: "Ratón mecánico RGB con sensor óptico de 16.000 DPI y diseño ergonómico ultraligero. Conexión inalámbrica de baja latencia para gaming competitivo.",
+        fotos: ["https://placehold.co/400x400/1C2039/00E5FF?text=Ratón+RGB"],
+        specs: { "Sensor": "Óptico 16K DPI", "Conexión": "2.4GHz", "Peso": "63g", "RGB": "16.8M" }
     },
     {
-        id: "2", name: "Webcam Logitech C920 HD Pro", price: 150000, category: "Periféricos",
-        descripcion: "Grabación en 1080p con micrófono estéreo integrado y enfoque automático. Ideal para videollamadas profesionales, streaming o clases virtuales.",
-        fotos: ["https://placehold.co/400x400/1C2039/00E5FF?text=C920+Camera", "https://placehold.co/400x400/1C2039/B026FF?text=C920+Mount"], isPromo: false, specs: { "Resolución": "1080p", "Micrófono": "Estéreo" }
+        id: "2", name: "Alfombrilla RGB Extended Pro", price: 138000, category: "Periféricos", isPromo: false,
+        descripcion: "Alfombrilla de escritorio extendida con iluminación RGB perimetral, superficie de micro-textura optimizada para precisión y base antideslizante.",
+        fotos: ["/photos/mousepad.png"],
+        specs: { "Tamaño": "900x400mm", "RGB": "Perimetral", "Superficie": "Micro-textura", "Base": "Antideslizante" }
     },
     {
-        id: "4", name: "Audífonos In-ear G304 / X15 Gamer", price: 30000, category: "Audio",
-        descripcion: "Audífonos TWS con estuche de carga magnética y sonido nítido para cualquier situación. Ideales para trabajo, estudio o viajes en transporte.",
-        fotos: ["https://placehold.co/400x400/1C2039/00E5FF?text=X15+Case", "https://placehold.co/400x400/1C2039/B026FF?text=X15+Buds"], isPromo: false, specs: { "Tipo": "In-ear TWS", "Estuche": "Carga magnética" }
+        id: "3", name: "Soporte de Teclado Quantum", price: 69000, category: "Periféricos", isPromo: false,
+        descripcion: "Soporte ergonómico para teclado mecánico con ángulo ajustable, construcción de aluminio anodizado y pads de silicona antideslizantes.",
+        fotos: ["/photos/microphone.png"],
+        specs: { "Material": "Aluminio", "Ángulo": "Ajustable", "Pads": "Silicona", "Compatible": "Universal" }
+    },
+
+    // 🎧 Audio
+    {
+        id: "4", name: "HIFI X60", price: 148000, category: "Audio", isPromo: false,
+        descripcion: "Audífonos over-ear Hi-Fi con drivers de 50mm planar-magnéticos y cancelación activa de ruido adaptativa. Almohadillas de espuma viscoelástica para sesiones prolongadas.",
+        fotos: ["https://placehold.co/400x400/1C2039/00E5FF?text=HIFI+X60"],
+        specs: { "Drivers": "50mm Planar", "ANC": "Adaptativa", "Batería": "40h", "Bluetooth": "5.3" }
+    },
+
+    // 🏠 Smart Home
+    {
+        id: "5", name: "Termostato Inteligente Pro", price: 98000, category: "Smart Home", isPromo: false,
+        descripcion: "Termostato con pantalla táctil LCD a color, control por app, programación inteligente y compatibilidad con Alexa y Google Home.",
+        fotos: ["/photos/smart_thermostat.png"],
+        specs: { "Pantalla": "LCD Color", "Compatible": "Alexa/Google", "WiFi": "2.4GHz", "Ahorro": "30%" }
     },
     {
-        id: "5", name: "Timbre Inalámbrico con Cámara", price: 60000, category: "Smart Home",
-        descripcion: "Monitorea tu puerta desde el celular con conexión WiFi y visión nocturna incluida. Perfecto para hogares que buscan seguridad inteligente sin instalación compleja.",
-        fotos: ["https://placehold.co/400x400/1C2039/00E5FF?text=Timbre+Smart", "https://placehold.co/400x400/1C2039/B026FF?text=Timbre+App"], isPromo: false, specs: { "Conexión": "WiFi", "Visión Nocturna": "Sí" }
+        id: "9", name: "Cámara de Seguridad Smart", price: 11000, category: "Smart Home", isPromo: false,
+        descripcion: "Cámara de seguridad inteligente 1080p con visión nocturna, detección de movimiento IA y almacenamiento en la nube. Audio bidireccional incluido.",
+        fotos: ["/photos/security_camera.png"],
+        specs: { "Resolución": "1080p", "Visión Nocturna": "IR", "Detección": "IA", "Audio": "Bidireccional" }
+    },
+
+    // 🔌 Accesorios
+    {
+        id: "6", name: "Kit de Limpieza Multiuso Pro", price: 35500, category: "Accesorios", isPromo: false,
+        descripcion: "Kit profesional de limpieza para electrónicos: spray antiestático, paños de microfibra, cepillos precisos y solución limpiadora. Todo para mantener tu setup impecable.",
+        fotos: ["/photos/cleaning_kit.png"],
+        specs: { "Componentes": "Spray+Paños+Cepillos", "Tipo": "Antiestático", "Uso": "Electrónicos", "Material": "Microfibra" }
     },
     {
-        id: "6", name: "Hub Adaptador Type-C 7 en 1", price: 30000, category: "Accesorios",
-        descripcion: "Convierte un puerto USB-C en 7 entradas simultáneas incluyendo HDMI, USB y SD. Perfecto para portátiles con pocos puertos en reuniones o viaje.",
-        fotos: ["/photos/7-1.webp", "https://placehold.co/400x400/1C2039/B026FF?text=Hub+Cable"], isPromo: false, specs: { "Puertos": "USB, HDMI, SD", "Interfaz": "Type-C" }
+        id: "8", name: "Lápiz Óptico de Precisión Quantum", price: 26000, category: "Accesorios", isPromo: false,
+        descripcion: "Stylus de precisión con rechazo de palma, 4096 niveles de sensibilidad y carga Type-C. Ideal para diseñadores y creadores de contenido.",
+        fotos: ["/photos/stylus.webp"],
+        specs: { "Sensibilidad": "4096 niveles", "Rechazo Palma": "Sí", "Carga": "Type-C", "Compatible": "Universal" }
     },
+
+    // 💿 Software
     {
-        id: "7", name: "Licencia MICROSOFT 365", price: 50000, category: "Software",
-        descripcion: "Licencia vitalicia para hasta 5 dispositivos con Word, Excel, PowerPoint y más. Ideal para estudiantes y profesionales que necesitan Office completo.",
-        fotos: ["/photos/ofice.webp", "https://placehold.co/400x400/1C2039/B026FF?text=M365+Cloud"], isPromo: true, specs: { "Tipo": "Vitalicia", "Usuarios": "5 dispositivos" }
-    },
-    {
-        id: "8", name: "Lápiz Táctil Universal Stylus", price: 35000, category: "Accesorios",
-        descripcion: "Stylus con rechazo de palma y carga Type-C para dibujar o tomar notas en tablets. Ideal para diseñadores y estudiantes que trabajan en pantalla.",
-        fotos: ["/photos/stylus.webp", "https://placehold.co/400x400/1C2039/B026FF?text=Stylus+Tip"], isPromo: false, specs: { "Rechazo Palma": "Soportado", "Batería": "Type-C" }
+        id: "7", name: "Leeva Security Suite Pro", price: 99000, category: "Software", isPromo: true,
+        descripcion: "Licencia vitalicia de suite de productividad y seguridad con Office completo, antivirus y VPN incluidos. Protección total para hasta 5 dispositivos.",
+        fotos: ["/photos/ofice.webp"],
+        specs: { "Tipo": "Vitalicia", "Dispositivos": "5", "Incluye": "Office+AV+VPN", "Soporte": "24/7" }
     }
 ];
 
-// Asignar al scope global para que el frontend React lo lea
 window.PRODUCTS = mockProducts;

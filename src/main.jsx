@@ -14,6 +14,7 @@ import { ProductGrid } from './components/ui/ProductGrid';
 import { ProductModal } from './components/ui/ProductModal';
 import { Chatbot } from './components/features/Chatbot';
 import { Footer } from './components/layout/Footer';
+import { ParticleField } from './components/ui/ParticleField';
 
 function App() {
   useEffect(() => {
@@ -30,7 +31,10 @@ function App() {
 
   return (
     <StoreProvider>
-      <div className="min-h-screen bg-brand-bg text-white selection:bg-brand-cyan/20">
+      <div className="min-h-screen bg-quantum-deep text-white selection:bg-quantum-cyan/20">
+        {/* Global Particle Field */}
+        <ParticleField />
+        
         <TopBar />
         <Header />
         
