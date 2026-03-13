@@ -5,6 +5,7 @@ import './index.css';
 
 // Context
 import { StoreProvider } from './context/StoreContext';
+import { CartProvider } from './context/CartContext';
 
 // Components
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
@@ -14,6 +15,8 @@ import { Header } from './components/layout/Header';
 import { Hero } from './components/layout/Hero';
 import { ProductGrid } from './components/ui/ProductGrid';
 import { ProductModal } from './components/ui/ProductModal';
+import { CartDrawer } from './components/ui/CartDrawer';
+import { Toast } from './components/ui/Toast';
 import { Chatbot } from './components/features/Chatbot';
 import { TrustSection } from './components/features/TrustSection';
 import { Footer } from './components/layout/Footer';
@@ -45,12 +48,14 @@ function App() {
 
   return (
     <StoreProvider>
-      <div className="min-h-screen bg-quantum-deep text-white selection:bg-quantum-cyan/20">
-        {/* Offline Banner & Global Particle Field */}
-        <OfflineBanner />
-        <ParticleField />
-        
-        <TopBar />
+      <CartProvider>
+        <div className="min-h-screen bg-quantum-deep text-white selection:bg-quantum-cyan/20">
+          {/* Offline Banner & Global Particle Field */}
+          <OfflineBanner />
+          <ParticleField />
+          <Toast />
+          
+          <TopBar />
         <Header />
         
         <main>
@@ -64,8 +69,10 @@ function App() {
 
         {/* Overlays */}
         <ProductModal />
+        <CartDrawer />
         <Chatbot />
       </div>
+      </CartProvider>
     </StoreProvider>
   );
 }

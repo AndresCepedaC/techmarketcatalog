@@ -2,9 +2,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import * as Lucide from 'lucide-react';
+import Fuse from 'fuse.js';
 import { useStoreState } from '../../context/StoreContext';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useProducts } from '../../hooks/useProducts';
+import { trackSearch } from '../../utils/telemetry';
 import { ProductCard } from './ProductCard';
+import { ProductSkeleton } from './ProductSkeleton';
 import { CategoryFilters } from './CategoryFilters';
 
 const containerVariants = { 
@@ -18,34 +22,36 @@ const containerVariants = {
 export function ProductGrid() {
   const { searchQuery, selectedCategory } = useStoreState();
   const debouncedSearch = useDebounce(searchQuery, 300);
-  const [loading, setLoading] = useState(true);
+  const { data: products, loading } = useProducts();
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(t);
-  }, []);
+    if (debouncedSearch.trim()) {
+      trackSearch(debouncedSearch);
+    }
+  }, [debouncedSearch]);
 
   const filtered = useMemo(() => {
-    let list = window.PRODUCTS || [];
+    let list = products || [];
     if (selectedCategory !== "Todos") list = list.filter(p => p?.category === selectedCategory);
     if (debouncedSearch.trim()) {
-      const q = debouncedSearch.toLowerCase();
-      list = list.filter(p => 
-        p?.name?.toLowerCase().includes(q) || 
-        Object.values(p?.specs || {}).some(v => v?.toLowerCase().includes(q))
-      );
+      const fuse = new Fuse(list, {
+        keys: ['titulo', 'name', 'categoria', 'category', 'specs.*'],
+        threshold: 0.3,
+        ignoreLocation: true
+      });
+      list = fuse.search(debouncedSearch).map(result => result.item);
     }
     return list;
-  }, [debouncedSearch, selectedCategory]);
+  }, [debouncedSearch, selectedCategory, products]);
 
   const categoriesToRender = useMemo(() => [...new Set(filtered.map(p => p.category))], [filtered]);
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-20">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {[1,2,3,4,5,6,7,8].map(i => (
-            <div key={i} className="aspect-square shimmer rounded-3xl opacity-20 border border-white/5" />
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-20 mt-12">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10">
+          {[1,2,3,4,5,6].map(i => (
+             <ProductSkeleton key={i} />
           ))}
         </div>
       </div>

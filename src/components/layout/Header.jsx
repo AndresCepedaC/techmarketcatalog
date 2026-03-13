@@ -3,9 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useCart } from '../../context/CartContext';
 
 export function Header() {
   const { searchQuery, setSearchQuery } = useStore();
+  const { totalItems, setIsCartOpen } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -77,13 +79,18 @@ export function Header() {
             </button>
           </div>
 
-          <div className="flex items-center p-0.5 rounded-xl double-neon-cyan bg-quantum-cyan/10 shadow-neon-sm hover:shadow-neon-md transition-all">
+          <div className="flex items-center p-0.5 rounded-xl double-neon-cyan bg-quantum-cyan/10 shadow-neon-sm hover:shadow-neon-md transition-all relative">
             <button 
-              onClick={() => document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => setIsCartOpen(true)}
               className="p-3.5 bg-quantum-cyan text-quantum-deep rounded-lg hover:bg-white transition-all active:scale-95"
             >
               <Lucide.ShoppingBag size={20} />
             </button>
+            {totalItems > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-danger-red text-white text-[10px] font-black rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(255,42,95,0.6)]">
+                {totalItems}
+              </span>
+            )}
           </div>
         </div>
       </div>

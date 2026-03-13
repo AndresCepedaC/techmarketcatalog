@@ -3,10 +3,13 @@ import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useCart } from '../../context/CartContext';
 import { ImageMagnifier } from './ImageMagnifier';
+import { formatPrice } from '../../utils/currency';
 
 export function ProductModal() {
-  const { activeProduct, setActiveProduct } = useStore();
+  const { activeProduct, setActiveProduct, currency } = useStore();
+  const { addToCart } = useCart();
 
   useEffect(() => {
     if (!activeProduct) return;
@@ -15,10 +18,29 @@ export function ProductModal() {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
-    // Cerrar con Escape
+    // Cerrar con Escape y Focus Trap
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         setActiveProduct(null);
+        return;
+      }
+      
+      if (e.key === 'Tab') {
+        const focusableElements = document.querySelectorAll('#product-modal-container a[href], #product-modal-container button, #product-modal-container textarea, #product-modal-container input, #product-modal-container select');
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            lastElement.focus();
+            e.preventDefault();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            firstElement.focus();
+            e.preventDefault();
+          }
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -31,9 +53,8 @@ export function ProductModal() {
 
   if (!activeProduct) return null;
 
-  const handleWhatsAppDirect = () => {
-    const msg = `Hola, me interesa el ${activeProduct.name} de $${activeProduct.price.toLocaleString('en-US')}`;
-    window.open(`https://wa.me/573005054912?text=${encodeURIComponent(msg)}`, '_blank');
+  const handleAddToCart = () => {
+    addToCart(activeProduct);
   };
 
   return (
@@ -50,6 +71,9 @@ export function ProductModal() {
           initial={{ scale: 0.95, opacity: 0, y: 20 }} 
           animate={{ scale: 1, opacity: 1, y: 0 }} 
           exit={{ scale: 0.95, opacity: 0, y: 20 }} 
+          id="product-modal-container"
+          aria-modal="true"
+          role="dialog"
           className="relative w-full max-w-6xl glass-quantum double-neon-cyan/30 rounded-3xl overflow-hidden flex flex-col md:flex-row z-10 shadow-neon-xl max-h-[90vh] md:max-h-none overflow-y-auto border border-quantum-cyan/20"
         >
           <button 
@@ -61,10 +85,12 @@ export function ProductModal() {
 
           <div className="w-full md:w-1/2 p-10 md:p-16 bg-quantum-deep/50 flex items-center justify-center min-h-[400px] md:min-h-[600px] relative border-r border-white/5">
             <div className="absolute inset-0 micro-circuitry opacity-[0.05]" />
-            <ImageMagnifier 
-              src={activeProduct?.fotos?.[0] || activeProduct?.image} 
-              alt={activeProduct.name}
-            />
+            <motion.div layoutId={`product-image-${activeProduct.id}`} className="w-full h-full relative z-10 flex items-center justify-center">
+              <ImageMagnifier 
+                src={activeProduct?.fotos?.[0] || activeProduct?.image} 
+                alt={activeProduct.name}
+              />
+            </motion.div>
           </div>
 
           <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col relative z-20">
@@ -75,9 +101,9 @@ export function ProductModal() {
             
             <div className="flex items-baseline gap-3 mb-12">
               <span className="text-5xl font-black quantum-gradient-text text-glow-cyan">
-                ${activeProduct.price.toLocaleString('en-US')}
+                {formatPrice(activeProduct.price || activeProduct.precio, currency)}
               </span>
-              <span className="text-[10px] text-white/30 font-black uppercase tracking-[0.3em]">Divisa // COP</span>
+              <span className="text-[10px] text-white/30 font-black uppercase tracking-[0.3em]">Divisa // {currency}</span>
             </div>
 
             <div className="flex-1">
@@ -96,10 +122,10 @@ export function ProductModal() {
 
             <div className="mt-auto space-y-6 pt-10 border-t border-white/5">
               <button 
-                onClick={handleWhatsAppDirect} 
-                className="w-full py-5 rounded-2xl bg-quantum-cyan text-quantum-deep font-black shadow-neon-md hover:bg-white transition-all flex items-center justify-center gap-4 text-xs uppercase tracking-[0.2em] group active:scale-95"
+                onClick={handleAddToCart} 
+                className="w-full py-5 rounded-2xl font-black transition-all duration-300 flex items-center justify-center gap-4 text-xs uppercase tracking-[0.2em] group shadow-[0_0_20px_rgba(0,245,255,0.1)] active:scale-95 bg-quantum-cyan text-quantum-deep hover:bg-white border-transparent"
               >
-                <Lucide.Zap size={20} className="fill-current" /> Sincronizar con WhatsApp
+                <Lucide.ShoppingBag size={20} className="fill-current" /> AÑADIR AL NEXO DE CARGA
               </button>
               <div className="flex items-center justify-center gap-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-quantum-cyan animate-pulse" />

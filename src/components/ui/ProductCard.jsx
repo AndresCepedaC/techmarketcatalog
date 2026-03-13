@@ -3,6 +3,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import * as Lucide from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useCart } from '../../context/CartContext';
+import { trackProductView } from '../../utils/telemetry';
+import { formatPrice } from '../../utils/currency';
 
 const LEVITATE_CLASSES = ['animate-levitate-slow', 'animate-levitate-med', 'animate-levitate-fast'];
 
@@ -12,10 +15,10 @@ const itemVariants = {
 };
 
 const ProductCardComponent = function({ product, index }) {
-  const { setActiveProduct } = useStore();
+  const { setActiveProduct, currency } = useStore();
+  const { addToCart } = useCart();
   const [currentImg, setCurrentImg] = useState(0);
   const [imgLoaded, setImgLoaded] = useState(false);
-  const [shockwave, setShockwave] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const cardRef = useRef(null);
   
@@ -36,6 +39,7 @@ const ProductCardComponent = function({ product, index }) {
   // Data Model Unification
   const titulo = product?.titulo || product?.name || 'Tech';
   const precio = product?.precio || product?.price || 0;
+  const stock = typeof product?.stock === 'number' ? product.stock : 10; // Provide fake default if no stock data
   const rawFoto = product?.foto || product?.fotos;
   const fotos = Array.isArray(rawFoto) ? rawFoto : (typeof rawFoto === 'string' ? [rawFoto] : [`https://placehold.co/400x400/1C2039/00E5FF?text=${encodeURIComponent(titulo)}`]);
 
@@ -59,13 +63,7 @@ const ProductCardComponent = function({ product, index }) {
   
   const handleComprar = (e) => {
     e.stopPropagation();
-    setShockwave(true);
-    setTimeout(() => setShockwave(false), 600);
-    const msg = `Hola, me interesa el ${titulo} de $${precio.toLocaleString('en-US')}`;
-    const whatsappNum = import.meta.env.VITE_WHATSAPP_NUMBER || '573005054912';
-    setTimeout(() => {
-      window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(msg)}`, '_blank');
-    }, 300);
+    addToCart(product);
   };
 
   return (
@@ -75,7 +73,10 @@ const ProductCardComponent = function({ product, index }) {
       onMouseLeave={handleMouseLeave}
       variants={itemVariants} 
       className={`group relative floating-island overflow-visible cursor-pointer flex flex-col h-full ${levitateClass}`}
-      onClick={() => setActiveProduct(product)}
+      onClick={() => {
+        trackProductView(product.name || product.titulo);
+        setActiveProduct(product);
+      }}
       style={{ 
         animationDelay: `${index * 0.3}s`,
         rotateX: isMobile ? 0 : rotateX,
@@ -129,6 +130,7 @@ const ProductCardComponent = function({ product, index }) {
           )}
           <motion.img 
             key={currentImg} 
+            layoutId={`product-image-${product.id}`}
             initial={{ opacity: 0, scale: 0.9, filter: isMobile ? 'none' : 'blur(10px)' }}
             animate={{ opacity: imgLoaded ? 1 : 0, scale: 1, filter: 'blur(0px)' }}
             transition={{ duration: 0.6 }}
@@ -153,31 +155,44 @@ const ProductCardComponent = function({ product, index }) {
       {/* Data Section */}
       <div className="p-6 md:p-8 flex flex-col flex-1 relative z-10 bg-quantum-deep/80 md:bg-quantum-deep/40 rounded-b-[24px] md:backdrop-blur-md" style={{ transform: isMobile ? 'none' : 'translateZ(30px)' }}>
         {/* Product Name */}
-        <h3 className="font-black text-lg md:text-xl text-white mb-3 line-clamp-2 tracking-tight transition-all group-hover:text-quantum-cyan text-glow-cyan leading-snug">
+        <h3 className="font-black text-lg md:text-xl text-white mb-2 line-clamp-2 tracking-tight transition-all group-hover:text-quantum-cyan text-glow-cyan leading-snug">
           {titulo}
         </h3>
         
         {/* Holographic spec readout */}
-        <div className="holo-data text-[11px] mb-6 line-clamp-2 leading-relaxed tracking-widest uppercase text-quantum-cyan/60">
-          {product?.specs ? Object.values(product.specs).join(" // ") : 'SPEC_NULL'}
+        <div className="flex-1">
+          <div className="holo-data text-[11px] mb-6 line-clamp-2 leading-relaxed tracking-widest uppercase text-quantum-cyan/60">
+            {product?.specs ? Object.values(product.specs).join(" // ") : 'SPEC_NULL'}
+          </div>
         </div>
         
-        {/* Price + Buy */}
-        <div className="flex flex-col xl:flex-row xl:items-end justify-between mt-auto pt-5 border-t border-white/10 gap-4">
-          <div className="flex flex-col">
-            <span className="text-[9px] uppercase text-white/40 font-black tracking-[0.4em] mb-1.5 flex items-center gap-2">
+        {/* Conversion Block (Gestalt Grouping) */}
+        <div className="mt-4 p-5 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-5 relative">
+          
+          {/* FOMO Scarcity Trigger */}
+          {stock <= 5 && (
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 px-3 py-1 bg-danger-red/20 backdrop-blur-md rounded-full border border-danger-red/40 shadow-[0_0_15px_rgba(255,42,95,0.4)] mx-auto z-20 animate-pulse w-max">
+              <Lucide.AlertCircle size={10} className="text-danger-red" />
+              <span className="text-[9px] uppercase font-black tracking-[0.3em] text-danger-red">
+                Últimas {stock} unidades
+              </span>
+            </div>
+          )}
+
+          <div className="flex justify-between items-end">
+            <span className="text-[9px] uppercase text-white/40 font-black tracking-[0.4em] mb-1 flex items-center gap-2">
               <Lucide.Tag size={10} className="text-quantum-cyan" /> NET VALUE
             </span>
             <span className="text-3xl font-black text-white group-hover:text-quantum-purple transition-all text-glow-purple drop-shadow-[0_0_15px_rgba(157,0,255,0.4)]">
-              ${precio.toLocaleString('en-US')}
+              {formatPrice(precio, currency)}
             </span>
           </div>
           
           <button 
             onClick={handleComprar} 
-            className={`neon-wave-btn h-12 px-8 rounded-xl text-quantum-cyan font-black text-[12px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 ${shockwave ? 'animate-pulse' : ''}`}
+            className={`neon-wave-btn w-full h-12 rounded-xl font-black text-[12px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 text-quantum-cyan hover:bg-quantum-cyan/10 transition-colors`}
           >
-            <Lucide.ShoppingBag size={14} /> ADQUIRIR
+            <Lucide.ShoppingBag size={14} /> ADQUIRIR AL NEXO
           </button>
         </div>
       </div>

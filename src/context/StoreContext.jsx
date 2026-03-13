@@ -7,6 +7,7 @@ const StoreDispatchContext = createContext();
 export function StoreProvider({ children }) {
   const [activeProduct, setActiveProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [currency, setCurrency] = useState('COP'); 
   const [selectedCategory, setSelectedCategory] = useState(() => {
     return localStorage.getItem('techmarket_category') || "Todos";
   });
@@ -18,13 +19,15 @@ export function StoreProvider({ children }) {
   const state = useMemo(() => ({
     activeProduct,
     searchQuery,
-    selectedCategory
-  }), [activeProduct, searchQuery, selectedCategory]);
+    selectedCategory,
+    currency
+  }), [activeProduct, searchQuery, selectedCategory, currency]);
 
   const dispatch = useMemo(() => ({
     setActiveProduct,
     setSearchQuery,
-    setSelectedCategory
+    setSelectedCategory,
+    setCurrency
   }), []);
 
   return (
