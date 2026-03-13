@@ -9,6 +9,7 @@ import { CartProvider } from './context/CartContext';
 // Components
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { OfflineBanner } from './hooks/useNetwork';
+import { TopBar } from './components/layout/TopBar';
 import { Header } from './components/layout/Header';
 import { Hero } from './components/layout/Hero';
 import { ProductGrid } from './components/ui/ProductGrid';
