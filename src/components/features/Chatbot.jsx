@@ -51,6 +51,7 @@ Catálogo: ${JSON.stringify(safeCatalog)}`;
       { role: "user", content: String(userMessage) }
     ]);
 
+    console.log("Payload enviado a Groq:", { model: GROQ_MODEL, messages });
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -64,7 +65,11 @@ Catálogo: ${JSON.stringify(safeCatalog)}`;
     const data = await res.json();
     return { ok: true, text: data.choices?.[0]?.message?.content || "No pude generar respuesta." };
   } catch (error) {
-    return { ok: false, text: "Lo siento, hubo un problema. ¿Podemos hablar por WhatsApp?" };
+    console.error("🔥 Error detallado en fetchGroqIA:", error);
+    return {
+      ok: false,
+      text: `Fallo interno del sistema: ${error.message}. Revisa la consola del navegador para más detalles.`
+    };
   }
 }
 
@@ -185,10 +190,10 @@ export function Chatbot() {
               {msgs.map((m, i) => (
                 <div key={i} className={`flex ${m.r === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`p-4 text-[12.5px] leading-relaxed rounded-2xl max-w-[85%] font-medium transition-all ${m.r === 'user'
-                      ? 'bg-quantum-cyan text-quantum-deep shadow-neon-sm font-black'
-                      : m.r === 'error'
-                        ? 'bg-red-500/10 border border-red-500/30 text-red-500 text-[11px]'
-                        : 'glass-quantum border-white/10 text-white/90 shadow-sm'
+                    ? 'bg-quantum-cyan text-quantum-deep shadow-neon-sm font-black'
+                    : m.r === 'error'
+                      ? 'bg-red-500/10 border border-red-500/30 text-red-500 text-[11px]'
+                      : 'glass-quantum border-white/10 text-white/90 shadow-sm'
                     }`}>
                     {m.t}
                     {m.r === 'error' && (
