@@ -1,5 +1,5 @@
 // [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
