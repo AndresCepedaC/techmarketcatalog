@@ -8,6 +8,10 @@
   <meta name="description" content="Descubre TECHMARKET. Tu destino definitivo para hardware de alto rendimiento, periféricos premium y equipos profesionales con estética neón inigualable. Eleva tu setup hoy." />
   <meta name="theme-color" content="#0B0D17" />
   
+  <!-- PWA & Favicons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <!-- SEO & Social Open Graph -->
   <meta property="og:title" content="Tech Market — Hardware & Setups Premium" />
   <meta property="og:description" content="Domina tu entorno digital con periféricos profesionales y hardware de última generación en TECHMARKET." />
@@ -28,8 +32,10 @@
 <body>
   <div id="root"></div>
 
-  <!-- Product Data -->
-  <script src="/data/products.js"></script>
+  <!-- Global Registry (Simulated) -->
+  <script>
+    window.PRODUCTS = [];
+  </script>
 
   <!-- Vite Entry Point -->
   <script type="module" src="/src/main.jsx"></script>
