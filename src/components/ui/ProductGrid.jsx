@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import * as Lucide from 'lucide-react';
-import { useStore } from '../../context/StoreContext';
+import { useStoreState } from '../../context/StoreContext';
+import { useDebounce } from '../../hooks/useDebounce';
 import { ProductCard } from './ProductCard';
 import { CategoryFilters } from './CategoryFilters';
 
@@ -15,7 +16,8 @@ const containerVariants = {
 };
 
 export function ProductGrid() {
-  const { searchQuery, selectedCategory } = useStore();
+  const { searchQuery, selectedCategory } = useStoreState();
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,15 +28,15 @@ export function ProductGrid() {
   const filtered = useMemo(() => {
     let list = window.PRODUCTS || [];
     if (selectedCategory !== "Todos") list = list.filter(p => p?.category === selectedCategory);
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase();
       list = list.filter(p => 
         p?.name?.toLowerCase().includes(q) || 
         Object.values(p?.specs || {}).some(v => v?.toLowerCase().includes(q))
       );
     }
     return list;
-  }, [searchQuery, selectedCategory]);
+  }, [debouncedSearch, selectedCategory]);
 
   const categoriesToRender = useMemo(() => [...new Set(filtered.map(p => p.category))], [filtered]);
 

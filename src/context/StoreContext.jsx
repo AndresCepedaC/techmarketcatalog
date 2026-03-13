@@ -1,26 +1,60 @@
 // [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 
-const StoreContext = createContext();
+const StoreStateContext = createContext();
+const StoreDispatchContext = createContext();
 
 export function StoreProvider({ children }) {
   const [activeProduct, setActiveProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Todos");
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+    return localStorage.getItem('techmarket_category') || "Todos";
+  });
 
-  const value = useMemo(() => ({
-    activeProduct, setActiveProduct,
-    searchQuery, setSearchQuery,
-    selectedCategory, setSelectedCategory
+  useEffect(() => {
+    localStorage.setItem('techmarket_category', selectedCategory);
+  }, [selectedCategory]);
+
+  const state = useMemo(() => ({
+    activeProduct,
+    searchQuery,
+    selectedCategory
   }), [activeProduct, searchQuery, selectedCategory]);
 
-  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+  const dispatch = useMemo(() => ({
+    setActiveProduct,
+    setSearchQuery,
+    setSelectedCategory
+  }), []);
+
+  return (
+    <StoreStateContext.Provider value={state}>
+      <StoreDispatchContext.Provider value={dispatch}>
+        {children}
+      </StoreDispatchContext.Provider>
+    </StoreStateContext.Provider>
+  );
 }
 
-export function useStore() {
-  const context = useContext(StoreContext);
-  if (!context) {
-    throw new Error('useStore must be used within a StoreProvider');
+export function useStoreState() {
+  const context = useContext(StoreStateContext);
+  if (context === undefined) {
+    throw new Error('useStoreState must be used within a StoreProvider');
   }
   return context;
+}
+
+export function useStoreDispatch() {
+  const context = useContext(StoreDispatchContext);
+  if (context === undefined) {
+    throw new Error('useStoreDispatch must be used within a StoreProvider');
+  }
+  return context;
+}
+
+// Retro-compatibilidad temporal (evita romper componentes no migrados si los hay)
+export function useStore() {
+  const state = useStoreState();
+  const dispatch = useStoreDispatch();
+  return { ...state, ...dispatch };
 }

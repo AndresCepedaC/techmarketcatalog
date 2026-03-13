@@ -1,5 +1,5 @@
 // [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
@@ -7,6 +7,27 @@ import { ImageMagnifier } from './ImageMagnifier';
 
 export function ProductModal() {
   const { activeProduct, setActiveProduct } = useStore();
+
+  useEffect(() => {
+    if (!activeProduct) return;
+
+    // Bloquear scroll
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    // Cerrar con Escape
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setActiveProduct(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [activeProduct, setActiveProduct]);
 
   if (!activeProduct) return null;
 

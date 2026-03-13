@@ -1,40 +1,44 @@
 [
-    {
-        "id": 1,
-        "foto": "https://m.media-amazon.com/images/I/71f5Eu5lJSL._AC_SL1500_.jpg",
-        "titulo": "MacBook Air M4",
-        "descripcion": "Chip Apple M4 con CPU de 10 núcleos y GPU de 10 núcleos. 16 GB de memoria unificada, SSD de 256 GB, pantalla Liquid Retina de 13.6 pulgadas, hasta 18 horas de batería. El portátil más delgado del mundo.",
-        "colores": [
-            "Medianoche",
-            "Luz estelar",
-            "Gris espacial",
-            "Plata"
-        ],
-        "precio": 1099
-    },
-    {
-        "id": 2,
-        "foto": "https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-s25-ultra-sm-s938.jpg",
-        "titulo": "Samsung Galaxy S25 Ultra",
-        "descripcion": "Pantalla Dynamic AMOLED 2X de 6.9 pulgadas, procesador Snapdragon 8 Elite, 12 GB RAM, 256 GB almacenamiento, cámara principal de 200 MP con zoom óptico 5x, batería de 5000 mAh, S Pen integrado y Galaxy AI.",
-        "colores": [
-            "Titanium Black",
-            "Titanium Gray",
-            "Titanium Silver Blue",
-            "Titanium White Silver"
-        ],
-        "precio": 1299
-    },
-    {
-        "id": 3,
-        "foto": "https://m.media-amazon.com/images/I/61mpMH5TzkL._AC_SL1500_.jpg",
-        "titulo": "Logitech G PRO X Superlight 2",
-        "descripcion": "Ratón gaming inalámbrico de 60 g con sensor HERO 2 de 44K DPI, tecnología LIGHTSPEED, switches ópticos LIGHTFORCE híbridos, hasta 95 horas de batería y pies de PTFE de grado cero.",
-        "colores": [
-            "Negro",
-            "Blanco",
-            "Rosa"
-        ],
-        "precio": 159
+  {
+    "id": 1,
+    "titulo": "MacBook Pro M4 Max",
+    "precio": 12500000,
+    "foto": "https://placehold.co/800x800/1C2039/00E5FF?text=MacBook+M4",
+    "categoria": "Laptops",
+    "isPromo": true,
+    "specs": {
+      "Chip": "M4 Max 16-Core",
+      "RAM": "64GB Unificada",
+      "Almacenamiento": "2TB SSD NVMe",
+      "Pantalla": "16.2\" Liquid Retina XDR"
     }
+  },
+  {
+    "id": 2,
+    "titulo": "Logitech G Pro X Superlight 2",
+    "precio": 650000,
+    "foto": "https://placehold.co/800x800/1C2039/00E5FF?text=Superlight+2",
+    "categoria": "Periféricos",
+    "isPromo": false,
+    "specs": {
+      "Sensor": "HERO 2 32K DPI",
+      "Peso": "60 gramos",
+      "Conectividad": "LIGHTSPEED Wireless",
+      "Batería": "95 Horas"
+    }
+  },
+  {
+    "id": 3,
+    "titulo": "Monitor ASUS ROG Swift OLED",
+    "precio": 4200000,
+    "foto": "https://placehold.co/800x800/1C2039/00E5FF?text=ROG+OLED",
+    "categoria": "Monitores",
+    "isPromo": true,
+    "specs": {
+      "Panel": "27\" WOLED",
+      "Refresco": "240Hz",
+      "Respuesta": "0.03ms",
+      "Resolución": "1440p QHD"
+    }
+  }
 ]

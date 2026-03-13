@@ -153,35 +153,28 @@
 
   /* === NEON SHOCKWAVE BUTTON === */
   .neon-wave-btn {
-    position: relative;
-    overflow: hidden;
+    @apply relative overflow-hidden transition-all duration-300;
     background: linear-gradient(135deg, rgba(0, 245, 255, 0.15), rgba(0, 245, 255, 0.05));
     border: 1px solid rgba(0, 245, 255, 0.4);
     box-shadow: 0 0 20px rgba(0, 245, 255, 0.1), inset 0 0 20px rgba(0, 245, 255, 0.05);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .neon-wave-btn:hover {
+    @apply scale-105;
     background: linear-gradient(135deg, rgba(0, 245, 255, 0.3), rgba(0, 245, 255, 0.1));
     border-color: rgba(0, 245, 255, 0.7);
     box-shadow: 0 0 40px rgba(0, 245, 255, 0.2), 0 0 80px rgba(0, 245, 255, 0.1), inset 0 0 30px rgba(0, 245, 255, 0.1);
-    transform: scale(1.03);
   }
   .neon-wave-btn:active {
-    transform: scale(0.97);
+    @apply scale-95;
   }
   .neon-wave-btn::before {
     content: '';
-    position: absolute;
-    inset: 0;
+    @apply absolute inset-0 opacity-0 scale-0 transition-all duration-500;
     background: radial-gradient(circle at center, rgba(0, 245, 255, 0.4), transparent 70%);
-    opacity: 0;
-    transform: scale(0);
-    transition: all 0.5s;
   }
   .neon-wave-btn:active::before {
-    opacity: 1;
+    @apply opacity-100 duration-150;
     transform: scale(2.5);
-    transition: all 0.15s;
   }
 
   /* === 3D TEXT MONUMENTAL === */

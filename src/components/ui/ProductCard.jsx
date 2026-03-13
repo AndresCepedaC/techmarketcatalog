@@ -1,5 +1,5 @@
 // [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import * as Lucide from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
@@ -11,12 +11,21 @@ const itemVariants = {
   show: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 70, damping: 15, mass: 0.8 } } 
 };
 
-export function ProductCard({ product, index }) {
+const ProductCardComponent = function({ product, index }) {
   const { setActiveProduct } = useStore();
   const [currentImg, setCurrentImg] = useState(0);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [shockwave, setShockwave] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const cardRef = useRef(null);
+  
+  // Detect mobile on mount for JS-driven animations
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // 3D Tilt Effect Values
   const x = useMotionValue(0);
@@ -24,17 +33,23 @@ export function ProductCard({ product, index }) {
   const rotateX = useTransform(y, [-100, 100], [4, -4]);
   const rotateY = useTransform(x, [-100, 100], [-4, 4]);
   
-  const fotos = product?.fotos || [`https://placehold.co/400x400/1C2039/00E5FF?text=${encodeURIComponent(product?.name || 'Tech')}`];
+  // Data Model Unification
+  const titulo = product?.titulo || product?.name || 'Tech';
+  const precio = product?.precio || product?.price || 0;
+  const rawFoto = product?.foto || product?.fotos;
+  const fotos = Array.isArray(rawFoto) ? rawFoto : (typeof rawFoto === 'string' ? [rawFoto] : [`https://placehold.co/400x400/1C2039/00E5FF?text=${encodeURIComponent(titulo)}`]);
+
   const levitateClass = LEVITATE_CLASSES[index % 3];
   
   const handleMouseMove = (event) => {
-    if (!cardRef.current) return;
+    if (isMobile || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     x.set(event.clientX - rect.left - rect.width / 2);
     y.set(event.clientY - rect.top - rect.height / 2);
   };
 
   const handleMouseLeave = () => {
+    if (isMobile) return;
     x.set(0);
     y.set(0);
   };
@@ -46,9 +61,10 @@ export function ProductCard({ product, index }) {
     e.stopPropagation();
     setShockwave(true);
     setTimeout(() => setShockwave(false), 600);
-    const msg = `Hola, me interesa el ${product.name} de $${product.price.toLocaleString('en-US')}`;
+    const msg = `Hola, me interesa el ${titulo} de $${precio.toLocaleString('en-US')}`;
+    const whatsappNum = import.meta.env.VITE_WHATSAPP_NUMBER || '573005054912';
     setTimeout(() => {
-      window.open(`https://wa.me/573005054912?text=${encodeURIComponent(msg)}`, '_blank');
+      window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(msg)}`, '_blank');
     }, 300);
   };
 
@@ -62,21 +78,21 @@ export function ProductCard({ product, index }) {
       onClick={() => setActiveProduct(product)}
       style={{ 
         animationDelay: `${index * 0.3}s`,
-        rotateX,
-        rotateY,
-        transformStyle: 'preserve-3d',
-        perspective: '1000px',
-        willChange: 'transform'
+        rotateX: isMobile ? 0 : rotateX,
+        rotateY: isMobile ? 0 : rotateY,
+        transformStyle: isMobile ? 'flat' : 'preserve-3d',
+        perspective: isMobile ? 'none' : '1000px',
+        willChange: isMobile ? 'auto' : 'transform'
       }}
     >
       {/* Volumetric top light */}
       <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-quantum-cyan/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none rounded-t-3xl" />
       
       {/* Ambient glow on hover */}
-      <div className="absolute -inset-2 bg-quantum-cyan/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none rounded-3xl" />
+      <div className="absolute -inset-2 bg-quantum-cyan/5 md:blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none rounded-3xl" />
       
       {/* Floating micro-particles inside card */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden hidden md:block">
         {[0,1,2].map(i => (
           <div key={i} className="absolute rounded-full bg-quantum-cyan/30 animate-float" style={{
             width: 2 + i, height: 2 + i,
@@ -95,13 +111,13 @@ export function ProductCard({ product, index }) {
       )}
 
       {/* Product Image Area */}
-      <div className="relative aspect-square bg-quantum-deep/40 border-b border-white/5 overflow-hidden flex items-center justify-center rounded-t-3xl" style={{ transform: 'translateZ(20px)' }}>
+      <div className="relative aspect-square bg-quantum-deep/40 border-b border-white/5 overflow-hidden flex items-center justify-center rounded-t-3xl" style={{ transform: isMobile ? 'none' : 'translateZ(20px)' }}>
         {fotos.length > 1 && (
           <>
-            <button onClick={handlePrevImg} className="absolute left-3 z-30 p-2.5 glass-quantum text-quantum-cyan rounded-xl opacity-0 hover:bg-quantum-cyan hover:text-quantum-deep group-hover:opacity-100 transition-all shadow-neon-sm">
+            <button onClick={handlePrevImg} aria-label="Imagen anterior" className="absolute left-3 z-30 p-2.5 glass-quantum text-quantum-cyan rounded-xl opacity-0 hover:bg-quantum-cyan hover:text-quantum-deep group-hover:opacity-100 transition-all shadow-neon-sm">
               <Lucide.ChevronLeft size={16} />
             </button>
-            <button onClick={handleNextImg} className="absolute right-3 z-30 p-2.5 glass-quantum text-quantum-cyan rounded-xl opacity-0 hover:bg-quantum-cyan hover:text-quantum-deep group-hover:opacity-100 transition-all shadow-neon-sm">
+            <button onClick={handleNextImg} aria-label="Siguiente imagen" className="absolute right-3 z-30 p-2.5 glass-quantum text-quantum-cyan rounded-xl opacity-0 hover:bg-quantum-cyan hover:text-quantum-deep group-hover:opacity-100 transition-all shadow-neon-sm">
               <Lucide.ChevronRight size={16} />
             </button>
           </>
@@ -113,13 +129,18 @@ export function ProductCard({ product, index }) {
           )}
           <motion.img 
             key={currentImg} 
-            initial={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
+            initial={{ opacity: 0, scale: 0.9, filter: isMobile ? 'none' : 'blur(10px)' }}
             animate={{ opacity: imgLoaded ? 1 : 0, scale: 1, filter: 'blur(0px)' }}
             transition={{ duration: 0.6 }}
             src={fotos[currentImg]} 
             onLoad={() => setImgLoaded(true)}
+            onError={(e) => {
+              e.target.src = "https://placehold.co/400x400/1C2039/FF3366?text=Imagen+No+Disponible";
+              setImgLoaded(true);
+            }}
+            loading="lazy"
             className="w-full h-full object-contain p-8 group-hover:scale-110 transition-transform duration-1000 volumetric-glow" 
-            alt={product?.name}
+            alt={titulo}
           />
         </AnimatePresence>
 
@@ -130,10 +151,10 @@ export function ProductCard({ product, index }) {
       </div>
 
       {/* Data Section */}
-      <div className="p-6 md:p-8 flex flex-col flex-1 relative z-10 bg-quantum-deep/40 rounded-b-[24px] backdrop-blur-md" style={{ transform: 'translateZ(30px)' }}>
+      <div className="p-6 md:p-8 flex flex-col flex-1 relative z-10 bg-quantum-deep/80 md:bg-quantum-deep/40 rounded-b-[24px] md:backdrop-blur-md" style={{ transform: isMobile ? 'none' : 'translateZ(30px)' }}>
         {/* Product Name */}
         <h3 className="font-black text-lg md:text-xl text-white mb-3 line-clamp-2 tracking-tight transition-all group-hover:text-quantum-cyan text-glow-cyan leading-snug">
-          {product?.name}
+          {titulo}
         </h3>
         
         {/* Holographic spec readout */}
@@ -148,7 +169,7 @@ export function ProductCard({ product, index }) {
               <Lucide.Tag size={10} className="text-quantum-cyan" /> NET VALUE
             </span>
             <span className="text-3xl font-black text-white group-hover:text-quantum-purple transition-all text-glow-purple drop-shadow-[0_0_15px_rgba(157,0,255,0.4)]">
-              ${product?.price?.toLocaleString('en-US')}
+              ${precio.toLocaleString('en-US')}
             </span>
           </div>
           
@@ -162,7 +183,11 @@ export function ProductCard({ product, index }) {
       </div>
 
       {/* Decorative circuitry grain */}
-      <div className="absolute inset-0 micro-circuitry opacity-[0.03] pointer-events-none" />
+      <div className="absolute inset-0 micro-circuitry opacity-[0.03] pointer-events-none hidden md:block" />
     </motion.div>
   );
-}
+};
+
+export const ProductCard = React.memo(ProductCardComponent, (prevProps, nextProps) => {
+  return prevProps.product?.id === nextProps.product?.id;
+});

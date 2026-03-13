@@ -98,7 +98,7 @@ export function Hero() {
               <Lucide.ArrowRight size={20} className="transition-transform group-hover:translate-x-3 group-hover:text-white" />
             </button>
             <a 
-              href="https://wa.me/573005054912" 
+              href={`https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER || '573005054912'}`} 
               target="_blank" 
               rel="noreferrer"
               className="glass-quantum px-12 py-6 sm:px-16 rounded-2xl font-black text-sm uppercase tracking-[0.25em] text-white/60 hover:text-white flex items-center justify-center gap-4 transition-all duration-300 border-white/10 hover:border-quantum-purple/60 hover:bg-quantum-purple/10 hover:shadow-[0_0_40px_rgba(157,0,255,0.3)] w-full sm:w-auto overflow-hidden group relative"

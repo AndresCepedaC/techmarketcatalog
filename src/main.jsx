@@ -8,6 +8,7 @@ import { StoreProvider } from './context/StoreContext';
 
 // Components
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
+import { OfflineBanner } from './hooks/useNetwork';
 import { TopBar } from './components/layout/TopBar';
 import { Header } from './components/layout/Header';
 import { Hero } from './components/layout/Hero';
@@ -45,7 +46,8 @@ function App() {
   return (
     <StoreProvider>
       <div className="min-h-screen bg-quantum-deep text-white selection:bg-quantum-cyan/20">
-        {/* Global Particle Field */}
+        {/* Offline Banner & Global Particle Field */}
+        <OfflineBanner />
         <ParticleField />
         
         <TopBar />
