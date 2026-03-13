@@ -3,8 +3,7 @@ import React, { useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 
-// Context
-import { StoreProvider } from './context/StoreContext';
+import { StoreProvider, useStore } from './context/StoreContext';
 import { CartProvider } from './context/CartContext';
 
 // Components
@@ -17,6 +16,7 @@ import { ProductGrid } from './components/ui/ProductGrid';
 import { ProductModal } from './components/ui/ProductModal';
 import { CartDrawer } from './components/ui/CartDrawer';
 import { Toast } from './components/ui/Toast';
+import { SocialProofToast } from './hooks/useSocialProof';
 import { Chatbot } from './components/features/Chatbot';
 import { TrustSection } from './components/features/TrustSection';
 import { Footer } from './components/layout/Footer';
@@ -33,6 +33,25 @@ import { ParticleField } from './components/ui/ParticleField';
  *   glows are built with custom Keyframes and Tailwind CSS.
  */
 
+function DeepLinkHandler() {
+  const { setActiveProduct } = useStore();
+  
+  useEffect(() => {
+    // Basic URL Synchronization for Products
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get('product');
+    
+    if (productId && window.PRODUCTS) {
+      const foundProduct = window.PRODUCTS.find(p => p.id.toString() === productId);
+      if (foundProduct) {
+        setActiveProduct(foundProduct);
+      }
+    }
+  }, [setActiveProduct]);
+  
+  return null;
+}
+
 function App() {
   useEffect(() => {
     // Proactive Image Pre-loading for LCP & Performance
@@ -48,12 +67,14 @@ function App() {
 
   return (
     <StoreProvider>
+      <DeepLinkHandler />
       <CartProvider>
         <div className="min-h-screen bg-quantum-deep text-white selection:bg-quantum-cyan/20">
           {/* Offline Banner & Global Particle Field */}
           <OfflineBanner />
           <ParticleField />
           <Toast />
+          <SocialProofToast />
           
           <TopBar />
         <Header />

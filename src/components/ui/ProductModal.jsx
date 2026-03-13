@@ -6,10 +6,18 @@ import { useStore } from '../../context/StoreContext';
 import { useCart } from '../../context/CartContext';
 import { ImageMagnifier } from './ImageMagnifier';
 import { formatPrice } from '../../utils/currency';
+import { useProducts } from '../../hooks/useProducts';
 
 export function ProductModal() {
   const { activeProduct, setActiveProduct, currency } = useStore();
   const { addToCart } = useCart();
+  const { data: products } = useProducts();
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  // Reset image index when modal opens with a new product
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [activeProduct]);
 
   useEffect(() => {
     if (!activeProduct) return;
@@ -56,6 +64,17 @@ export function ProductModal() {
   const handleAddToCart = () => {
     addToCart(activeProduct);
   };
+  
+  const fotos = activeProduct?.fotos || (activeProduct?.image ? [activeProduct.image] : []);
+  const mainImageSrc = fotos[activeImageIndex] || activeProduct?.image;
+
+  // Derive cross-sell items (up to 3 random items matching category but not same id)
+  const crossSellItems = React.useMemo(() => {
+    if (!products || !activeProduct) return [];
+    const related = products.filter(p => p.id !== activeProduct.id && p.category === activeProduct.category);
+    // Shuffle and pick 3
+    return related.sort(() => 0.5 - Math.random()).slice(0, 3);
+  }, [products, activeProduct]);
 
   return (
     <AnimatePresence>
@@ -83,14 +102,31 @@ export function ProductModal() {
             <Lucide.X size={20} />
           </button>
 
-          <div className="w-full md:w-1/2 p-10 md:p-16 bg-quantum-deep/50 flex items-center justify-center min-h-[400px] md:min-h-[600px] relative border-r border-white/5">
+          <div className="w-full md:w-1/2 p-10 md:p-16 bg-quantum-deep/50 flex flex-col relative border-r border-white/5">
             <div className="absolute inset-0 micro-circuitry opacity-[0.05]" />
-            <motion.div layoutId={`product-image-${activeProduct.id}`} className="w-full h-full relative z-10 flex items-center justify-center">
-              <ImageMagnifier 
-                src={activeProduct?.fotos?.[0] || activeProduct?.image} 
-                alt={activeProduct.name}
-              />
-            </motion.div>
+            <div className="flex-1 flex items-center justify-center min-h-[400px] mb-8 relative z-10 w-full">
+              <motion.div layoutId={`product-image-${activeProduct.id}`} className="w-full h-full relative z-10 flex items-center justify-center">
+                <ImageMagnifier 
+                  src={mainImageSrc} 
+                  alt={activeProduct.name}
+                />
+              </motion.div>
+            </div>
+            
+            {/* Thumbnail Gallery */}
+            {fotos.length > 1 && (
+              <div className="flex gap-4 justify-center relative z-10 overflow-x-auto py-2">
+                {fotos.map((foto, idx) => (
+                  <button 
+                    key={idx}
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${activeImageIndex === idx ? 'border-quantum-cyan shadow-neon-sm scale-110' : 'border-white/10 opacity-50 hover:opacity-100 hover:border-white/30'}`}
+                  >
+                    <img src={foto} alt={`${activeProduct.name} vista ${idx + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="w-full md:w-1/2 p-8 md:p-16 flex flex-col relative z-20">
@@ -133,6 +169,39 @@ export function ProductModal() {
                   Logística Asegurada // Cobertura Total Quindío
                 </p>
               </div>
+
+              {/* Cross-Selling Section */}
+              {crossSellItems.length > 0 && (
+                <div className="mt-12 pt-8 border-t border-white/5">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-quantum-cyan/80 mb-6 drop-shadow-[0_0_5px_rgba(0,245,255,0.4)]">
+                    COMPLETA TU SETUP
+                  </h4>
+                  <div className="space-y-4">
+                    {crossSellItems.map(item => {
+                      const itemImg = item.fotos?.[0] || item.foto || item.image || `https://placehold.co/100x100/1C2039/00E5FF?text=${item.name}`;
+                      const itemTitle = item.titulo || item.name;
+                      const itemPrice = item.precio || item.price || 0;
+                      return (
+                        <div key={item.id} className="flex items-center gap-4 p-3 rounded-xl bg-black/20 border border-white/5 hover:border-quantum-cyan/20 transition-colors group cursor-pointer" onClick={() => setActiveProduct(item)}>
+                          <div className="w-12 h-12 rounded-lg bg-quantum-deep flex items-center justify-center p-1.5 border border-white/5 flex-shrink-0">
+                            <img src={itemImg} alt={itemTitle} className="w-full h-full object-contain" />
+                          </div>
+                          <div className="flex-1">
+                            <h5 className="text-xs font-bold text-white leading-tight line-clamp-1 group-hover:text-quantum-cyan transition-colors">{itemTitle}</h5>
+                            <span className="text-[10px] text-quantum-purple font-black inline-block mt-0.5">{formatPrice(itemPrice, currency)}</span>
+                          </div>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); addToCart(item); }}
+                            className="w-8 h-8 rounded-full bg-quantum-cyan/10 text-quantum-cyan flex items-center justify-center group-hover:bg-quantum-cyan group-hover:text-quantum-deep transition-all shadow-[0_0_10px_rgba(0,245,255,0.1)] group-hover:shadow-[0_0_15px_rgba(0,245,255,0.3)]"
+                          >
+                            <Lucide.Plus size={14} className="font-black" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
