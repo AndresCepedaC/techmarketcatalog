@@ -1,44 +1,167 @@
 [
   {
-    "id": 1,
-    "titulo": "MacBook Pro M4 Max",
-    "precio": 12500000,
-    "foto": "https://placehold.co/800x800/1C2039/00E5FF?text=MacBook+M4",
-    "categoria": "Laptops",
+    "id": "101",
+    "titulo": "Intercomunicador DOBA K06A",
+    "precio": 148000,
+    "categoria": "Intercomunicadores",
     "isPromo": true,
+    "descripcion": "Comunicación inalámbrica entre pilotos en tiempo real con Bluetooth 5.0 y resistencia IPX6. Ideal para recorridos urbanos en moto bajo cualquier clima.",
+    "fotos": ["/photos/products/intercoms.jpg"],
     "specs": {
-      "Chip": "M4 Max 16-Core",
-      "RAM": "64GB Unificada",
-      "Almacenamiento": "2TB SSD NVMe",
-      "Pantalla": "16.2\" Liquid Retina XDR"
+      "Conectividad": "Bluetooth 5.0",
+      "Batería": "500mAh",
+      "Resistencia": "IPX6",
+      "Perfil": "Urbano"
     }
   },
   {
-    "id": 2,
-    "titulo": "Logitech G Pro X Superlight 2",
-    "precio": 650000,
-    "foto": "https://placehold.co/800x800/1C2039/00E5FF?text=Superlight+2",
-    "categoria": "Periféricos",
+    "id": "102",
+    "titulo": "Intercomunicador Q58",
+    "precio": 85000,
+    "categoria": "Intercomunicadores",
     "isPromo": false,
+    "descripcion": "Intercom para motociclistas con soporte para música compartida y audio Hi-Fi Estéreo. Batería de larga duración.",
+    "fotos": ["/photos/products/q58.jpg"],
     "specs": {
-      "Sensor": "HERO 2 32K DPI",
-      "Peso": "60 gramos",
-      "Conectividad": "LIGHTSPEED Wireless",
-      "Batería": "95 Horas"
+      "Batería": "1000mAh",
+      "Chip": "Qualcomm Dual",
+      "Música Compartida": "Soportado",
+      "Audio": "Hi-Fi Estéreo"
     }
   },
   {
-    "id": 3,
-    "titulo": "Monitor ASUS ROG Swift OLED",
-    "precio": 4200000,
-    "foto": "https://placehold.co/800x800/1C2039/00E5FF?text=ROG+OLED",
-    "categoria": "Monitores",
-    "isPromo": true,
+    "id": "103",
+    "titulo": "Intercomunicador Y30A",
+    "precio": 45000,
+    "categoria": "Intercomunicadores",
+    "isPromo": false,
+    "descripcion": "Intercom para 2 riders con alcance de hasta 1000 metros y cancelación de ruido DSP. Perfecto para rutas largas en carretera con acompañante.",
+    "fotos": ["/photos/products/intercoms.jpg"],
     "specs": {
-      "Panel": "27\" WOLED",
-      "Refresco": "240Hz",
-      "Respuesta": "0.03ms",
-      "Resolución": "1440p QHD"
+      "Rango": "Hasta 1000m",
+      "Intercom múltiple": "Sí (2 Riders)",
+      "Cancelación de Ruido": "DSP Avanzado",
+      "Resistencia": "IP67"
+    }
+  },
+  {
+    "id": "1",
+    "titulo": "Mouse Gamer Logitech G304",
+    "precio": 80000,
+    "categoria": "Periféricos",
+    "isPromo": true,
+    "descripcion": "Ratón mecánico inalámbrico con sensor Hero de 12.000 DPI y diseño ergonómico ultraligero. Conexión de baja latencia para gaming.",
+    "fotos": [
+      "/photos/products/mouseBlancoLogitech.jpg",
+      "/photos/products/mousesLogitech.jpg"
+    ],
+    "specs": {
+      "Sensor": "Hero",
+      "Conexión": "2.4GHz",
+      "DPI": "12.000",
+      "Peso": "Ultra ligero"
+    }
+  },
+  {
+    "id": "6",
+    "titulo": "Hub Adaptador Type-C 7 en 1",
+    "precio": 30000,
+    "categoria": "Accesorios",
+    "isPromo": false,
+    "descripcion": "Hub USB tipo C indispensable para tu setup, con múltiples puertos USB, HDMI y lector SD.",
+    "fotos": ["/photos/products/hubUSB.jpg"],
+    "specs": {
+      "Puertos": "USB, HDMI, SD",
+      "Interfaz": "Type-C",
+      "Compatibilidad": "Universal"
+    }
+  },
+  {
+    "id": "4",
+    "titulo": "Audífonos In-ear X15 Gamer",
+    "precio": 30000,
+    "categoria": "Audio",
+    "isPromo": false,
+    "descripcion": "Audífonos In-ear TWS Especiales para gaming con baja latencia y estuche de carga magnética.",
+    "fotos": ["/photos/products/headphones.jpg"],
+    "specs": {
+      "Tipo": "In-ear TWS",
+      "Estuche": "Carga magnética",
+      "Conexión": "Bluetooth",
+      "Uso": "Gaming"
+    }
+  },
+  {
+    "id": "11",
+    "titulo": "Micrófono Inalámbrico",
+    "precio": 45000,
+    "categoria": "Audio",
+    "isPromo": false,
+    "descripcion": "Micrófono inalámbrico ideal para streaming, podcast y creadores de contenido. Excelente cancelación de ruido y cero latencia.",
+    "fotos": ["/photos/products/wirelessMicrophone.jpg"],
+    "specs": {
+      "Tipo": "Inalámbrico",
+      "Uso": "Streaming",
+      "Conexión": "Receptor Tipo-C/Lightning"
+    }
+  },
+  {
+    "id": "5",
+    "titulo": "Smartwatch Deportivo Pro",
+    "precio": 98000,
+    "categoria": "Smart Home",
+    "isPromo": false,
+    "descripcion": "Reloj inteligente con monitoreo de salud, notificaciones, modos deportivos y batería de larga duración. Perfecto para tu día a día.",
+    "fotos": ["/photos/products/smartwatch.jpg"],
+    "specs": {
+      "Pantalla": "AMOLED",
+      "Resistencia": "IP68",
+      "Funciones": "Salud y Deportes",
+      "Batería": "14 días"
+    }
+  },
+  {
+    "id": "12",
+    "titulo": "Disco Duro Externo 1TB",
+    "precio": 180000,
+    "categoria": "Almacenamiento",
+    "isPromo": true,
+    "descripcion": "Almacenamiento portátil de alta velocidad y capacidad de 1TB. Perfecto para respaldar tu setup y llevar tus datos a todas partes.",
+    "fotos": ["/photos/products/discoDuro.jpg"],
+    "specs": {
+      "Capacidad": "1TB",
+      "Conexión": "USB 3.0",
+      "Tipo": "HDD Externo"
+    }
+  },
+  {
+    "id": "8",
+    "titulo": "Lápiz Óptico de Precisión Stylus",
+    "precio": 35000,
+    "categoria": "Accesorios",
+    "isPromo": false,
+    "descripcion": "Stylus de precisión con rechazo de palma y carga Type-C. Ideal para diseñadores, creativos y tomar notas.",
+    "fotos": ["/photos/products/stylus.png"],
+    "specs": {
+      "Sensibilidad": "Alta precisión",
+      "Rechazo Palma": "Soportado",
+      "Carga": "Type-C",
+      "Compatible": "Universal"
+    }
+  },
+  {
+    "id": "7",
+    "titulo": "Licencia MICROSOFT 365",
+    "precio": 50000,
+    "categoria": "Software",
+    "isPromo": true,
+    "descripcion": "Suscripción o licencia de suite de productividad Microsoft 365 con nube incluida.",
+    "fotos": ["/photos/products/m365.png"],
+    "specs": {
+      "Tipo": "Vitalicia/Anual",
+      "Usuarios": "5 dispositivos",
+      "Incluye": "Office+Nube",
+      "Soporte": "Microsoft"
     }
   }
 ]

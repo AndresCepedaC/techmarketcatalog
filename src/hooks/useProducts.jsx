@@ -26,14 +26,7 @@ export function useProducts() {
       } catch (err) {
         console.error("Error cargando productos:", err);
         if (isMounted) {
-          // Fallback to window.PRODUCTS if fetch fails (backwards compatibility locally if /data/ is missing)
-          if (window.PRODUCTS && window.PRODUCTS.length > 0) {
-             console.warn("Usando window.PRODUCTS como fallback de rescate.");
-             setData(window.PRODUCTS);
-             setError(null);
-          } else {
-             setError(err);
-          }
+           setError(err);
         }
       } finally {
         if (isMounted) {

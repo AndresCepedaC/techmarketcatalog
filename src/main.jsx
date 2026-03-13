@@ -9,10 +9,10 @@ import { CartProvider } from './context/CartContext';
 // Components
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { OfflineBanner } from './hooks/useNetwork';
-import { TopBar } from './components/layout/TopBar';
 import { Header } from './components/layout/Header';
 import { Hero } from './components/layout/Hero';
 import { ProductGrid } from './components/ui/ProductGrid';
+import { useProducts } from './hooks/useProducts';
 import { ProductModal } from './components/ui/ProductModal';
 import { CartDrawer } from './components/ui/CartDrawer';
 import { Toast } from './components/ui/Toast';
@@ -35,19 +35,20 @@ import { ParticleField } from './components/ui/ParticleField';
 
 function DeepLinkHandler() {
   const { setActiveProduct } = useStore();
+  const { data: products } = useProducts();
   
   useEffect(() => {
     // Basic URL Synchronization for Products
     const params = new URLSearchParams(window.location.search);
     const productId = params.get('product');
     
-    if (productId && window.PRODUCTS) {
-      const foundProduct = window.PRODUCTS.find(p => p.id.toString() === productId);
+    if (productId && products && products.length > 0) {
+      const foundProduct = products.find(p => p.id.toString() === productId);
       if (foundProduct) {
         setActiveProduct(foundProduct);
       }
     }
-  }, [setActiveProduct]);
+  }, [setActiveProduct, products]);
   
   return null;
 }

@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
+import { useProducts } from './useProducts';
 
 const CITIES = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena', 'Bucaramanga', 'Pereira', 'Manizales'];
 
 export function useSocialProof() {
   const [proofMessage, setProofMessage] = useState(null);
+  const { data: products } = useProducts();
 
   useEffect(() => {
     let timeoutId;
     
     const triggerProof = () => {
-      if (window.PRODUCTS && window.PRODUCTS.length > 0) {
-        const randomProduct = window.PRODUCTS[Math.floor(Math.random() * window.PRODUCTS.length)];
+      if (products && products.length > 0) {
+        const randomProduct = products[Math.floor(Math.random() * products.length)];
         const randomCity = CITIES[Math.floor(Math.random() * CITIES.length)];
         const nombre = randomProduct.name || randomProduct.titulo;
         
@@ -28,10 +30,12 @@ export function useSocialProof() {
     };
 
     // Iniciar primer trigger
-    timeoutId = setTimeout(triggerProof, 10000);
+    if (products && products.length > 0) {
+      timeoutId = setTimeout(triggerProof, 10000);
+    }
 
     return () => clearTimeout(timeoutId);
-  }, []);
+  }, [products]);
 
   return { proofMessage };
 }
