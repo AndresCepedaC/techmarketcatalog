@@ -1,129 +1,164 @@
 // [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
-import React, { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
-import Fuse from 'fuse.js';
-import { useStoreState } from '../../context/StoreContext';
-import { useDebounce } from '../../hooks/useDebounce';
+import { useStore } from '../../context/StoreContext';
 import { useProducts } from '../../hooks/useProducts';
+import { useDebounce } from '../../hooks/useDebounce';
+import { useProductSearch } from '../../hooks/useProductSearch';
 import { trackSearch } from '../../utils/telemetry';
 import { ProductCard } from './ProductCard';
 import { ProductSkeleton } from './ProductSkeleton';
 import { CategoryFilters } from './CategoryFilters';
 
-const containerVariants = {
+/**
+ * Variantes para las secciones y contenedores
+ */
+const sectionVariants = {
+  hidden: { opacity: 0, y: 30 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" }
+  },
+  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.3 } }
+};
+
+const gridVariants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+    transition: { staggerChildren: 0.1 }
   }
 };
 
 export function ProductGrid() {
-  const { searchQuery, selectedCategory } = useStoreState();
-  const debouncedSearch = useDebounce(searchQuery, 300);
+  const { searchQuery, selectedCategory } = useStore();
   const { data: products, loading } = useProducts();
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Usar el motor de búsqueda avanzado (Tarea 10)
+  const searchResults = useProductSearch(products, debouncedSearch);
 
   useEffect(() => {
     if (debouncedSearch.trim()) {
-      trackSearch(debouncedSearch);
+      trackSearch(debouncedSearch, searchResults.length);
     }
-  }, [debouncedSearch]);
+  }, [debouncedSearch, searchResults.length]);
 
-  const filtered = useMemo(() => {
-    let list = products || [];
-    if (selectedCategory !== "Todos") list = list.filter(p => p?.category === selectedCategory);
-    if (debouncedSearch.trim()) {
-      const fuse = new Fuse(list, {
-        keys: ['name', 'category', 'specs.*'],
-        threshold: 0.3,
-        ignoreLocation: true
-      });
-      list = fuse.search(debouncedSearch).map(result => result.item);
+  // Lógica de filtrado y agrupamiento
+  const renderMode = useMemo(() => {
+    if (debouncedSearch.trim()) return 'SEARCH';
+    if (selectedCategory !== "Todos") return 'CATEGORY';
+    return 'ALL';
+  }, [debouncedSearch, selectedCategory]);
+
+  const displayedContent = useMemo(() => {
+    if (renderMode === 'SEARCH') return searchResults;
+    if (renderMode === 'CATEGORY') {
+      return products.filter(p => p.category === selectedCategory);
     }
-    return list;
-  }, [debouncedSearch, selectedCategory, products]);
-
-  const categoriesToRender = useMemo(() => [...new Set(filtered.map(p => p.category))], [filtered]);
+    // Agrupar por categorías para el modo 'ALL'
+    const groups = {};
+    products.forEach(p => {
+      if (!groups[p.category]) groups[p.category] = [];
+      groups[p.category].push(p);
+    });
+    return groups;
+  }, [renderMode, searchResults, products, selectedCategory]);
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-20 mt-12">
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10">
-          {[1, 2, 3, 4, 5, 6].map(i => (
-            <ProductSkeleton key={i} />
-          ))}
-        </div>
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-20 mt-12 grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10">
+        {[1, 2, 3, 4, 5, 6, 7, 8].map(i => <ProductSkeleton key={i} />)}
       </div>
     );
   }
 
   return (
-    <section className="max-w-7xl mx-auto px-4 md:px-8 py-20 relative" id="catalog">
-      {/* Micro-circuitry backdrop */}
+    <section className="max-w-7xl mx-auto px-4 md:px-8 py-20 relative overflow-hidden" id="catalog">
       <div className="absolute inset-0 micro-circuitry opacity-[0.02] pointer-events-none" />
 
       <CategoryFilters />
 
-      {/* 3D Perspective Container */}
-      <div className="flex flex-col gap-40 perspective-deep">
-        {categoriesToRender.length > 0 ? (
-          categoriesToRender.map((cat, idx) => {
-            // Alternate ambient gradients between categories for mini-world feel
-            const isEven = idx % 2 === 0;
-            const bgGradient = isEven
-              ? 'bg-gradient-to-br from-quantum-cyan/5 via-transparent to-quantum-purple/5'
-              : 'bg-gradient-to-tr from-quantum-purple/5 via-transparent to-quantum-cyan/5';
-
-            return (
-              <div key={cat} className={`relative flex flex-col gap-16 p-8 md:p-12 rounded-[40px] border border-white/5 ${bgGradient} overflow-hidden group/cat transition-all duration-700 hover:border-quantum-cyan/20`}>
-
-                {/* Immersive Category Background Blur */}
-                <div className="absolute inset-0 bg-quantum-deep/40 backdrop-blur-xl -z-10" />
-                <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-quantum-cyan/10 blur-[120px] rounded-full pointer-events-none -z-10 opacity-50 group-hover/cat:opacity-100 transition-opacity duration-1000" />
-                <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] bg-quantum-purple/10 blur-[120px] rounded-full pointer-events-none -z-10 opacity-50 group-hover/cat:opacity-100 transition-opacity duration-1000" />
-
-                {/* Category Megatray Header */}
-                <div className="flex flex-col md:flex-row md:items-end gap-6 md:gap-12 relative z-10">
-                  <div className="flex flex-col relative">
-                    <div className="inline-flex items-center gap-3 mb-4">
-                      <span className="w-1.5 h-1.5 rounded-full bg-quantum-cyan animate-pulse" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.5em] text-quantum-cyan/60 holo-data">
-                        SECTOR // 0{idx + 1}
-                      </span>
-                    </div>
-                    <h2 className="text-5xl md:text-7xl font-black text-white uppercase tracking-tighter leading-none text-glow-cyan mix-blend-lighten drop-shadow-[0_0_30px_rgba(0,245,255,0.2)]">
-                      {cat}
-                    </h2>
-                  </div>
-                  <div className="h-[2px] flex-1 bg-gradient-to-r from-quantum-cyan/40 via-quantum-purple/20 to-transparent mt-4 md:mb-4 relative overflow-hidden">
-                    <div className="absolute inset-0 w-1/3 h-full bg-white/40 blur-[2px] animate-data-stream" style={{ animationDuration: '3s' }} />
-                  </div>
-                </div>
-
-                {/* Floating Products Grid */}
-                <motion.div
-                  variants={containerVariants}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true, amount: 0.1 }}
-                  className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10 preserve-3d"
-                >
-                  {filtered.filter(p => p.category === cat).map((p, idx) => (
-                    <ProductCard key={p.id} product={p} index={idx} />
+      <div className="relative z-10">
+        <AnimatePresence mode="wait">
+          {renderMode === 'ALL' ? (
+            <motion.div
+              key="sections-grid"
+              variants={gridVariants}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              className="space-y-32"
+            >
+              {Object.entries(displayedContent).map(([category, items], idx) => (
+                <CategorySection key={category} title={category} items={items} index={idx} />
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="simple-grid"
+              variants={sectionVariants}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              layout
+            >
+              {displayedContent.length > 0 ? (
+                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10">
+                  {displayedContent.map((p, i) => (
+                    <ProductCard key={p.id} product={p} index={i} />
                   ))}
-                </motion.div>
-              </div>
-            );
-          })
-        ) : (
-          <div className="py-32 text-center floating-island max-w-2xl mx-auto p-12">
-            <Lucide.Zap size={56} className="mx-auto mb-6 text-quantum-cyan/20 animate-pulse volumetric-glow" />
-            <p className="text-white/40 text-xl font-medium tracking-tight">Protocolo de búsqueda sin resultados.</p>
-            <p className="text-quantum-cyan/20 text-xs mt-2 uppercase tracking-widest holo-data">Intenta con otros términos</p>
-          </div>
-        )}
+                </div>
+              ) : (
+                <EmptyState />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </section>
+  );
+}
+
+function CategorySection({ title, items, index }) {
+  return (
+    <motion.div
+      variants={sectionVariants}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.2 }}
+      className="space-y-12"
+      layout
+    >
+      <div className="flex items-center gap-6">
+        <h2 className="text-2xl md:text-4xl font-black text-quantum-cyan uppercase tracking-[0.3em] text-glow-cyan">
+          {title}
+        </h2>
+        <div className="h-px flex-1 bg-gradient-to-r from-quantum-cyan/50 via-quantum-purple/20 to-transparent" />
+        <span className="text-[10px] font-mono text-white/20 tracking-widest">
+          SEC_{index.toString().padStart(2, '0')}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10">
+        {items.map((p, i) => (
+          <ProductCard key={p.id} product={p} index={i} />
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="py-32 text-center glass-quantum rounded-3xl border border-white/5 p-12 max-w-2xl mx-auto">
+      <Lucide.Zap size={56} className="mx-auto mb-6 text-quantum-cyan/20 animate-pulse" />
+      <h3 className="text-white/80 text-xl font-bold tracking-tight mb-2">Protocolo sin resultados</h3>
+      <p className="text-white/40 text-sm uppercase tracking-widest font-mono">
+        Ajusta tus parámetros de búsqueda o cambia de categoría.
+      </p>
+    </div>
   );
 }

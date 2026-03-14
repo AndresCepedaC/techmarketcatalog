@@ -6,6 +6,7 @@ import { useStore } from '../../context/StoreContext';
 import { useCart } from '../../context/CartContext';
 import { trackProductView } from '../../utils/telemetry';
 import { formatPrice } from '../../utils/currency';
+import { OptimizedImage } from './OptimizedImage';
 
 const LEVITATE_CLASSES = ['animate-levitate-slow', 'animate-levitate-med', 'animate-levitate-fast'];
 
@@ -18,7 +19,6 @@ const ProductCardComponent = function ({ product, index }) {
   const { setActiveProduct, currency } = useStore();
   const { addToCart } = useCart();
   const [currentImg, setCurrentImg] = useState(0);
-  const [imgLoaded, setImgLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const cardRef = useRef(null);
 
@@ -81,7 +81,7 @@ const ProductCardComponent = function ({ product, index }) {
         rotateX: isMobile ? 0 : rotateX,
         rotateY: isMobile ? 0 : rotateY,
         transformStyle: isMobile ? 'flat' : 'preserve-3d',
-        perspective: isMobile ? 'none' : '1000px',
+        perspective: isMobile ? '1000px',
         willChange: isMobile ? 'auto' : 'transform'
       }}
     >
@@ -124,24 +124,12 @@ const ProductCardComponent = function ({ product, index }) {
         )}
 
         <AnimatePresence mode="wait">
-          {!imgLoaded && (
-            <div className="absolute inset-0 shimmer" />
-          )}
-          <motion.img
+          <OptimizedImage
             key={currentImg}
             layoutId={`product-image-${product.id}`}
-            initial={{ opacity: 0, scale: 0.9, filter: isMobile ? 'none' : 'blur(10px)' }}
-            animate={{ opacity: imgLoaded ? 1 : 0, scale: 1, filter: 'blur(0px)' }}
-            transition={{ duration: 0.6 }}
             src={fotos[currentImg]}
-            onLoad={() => setImgLoaded(true)}
-            onError={(e) => {
-              e.target.src = "https://placehold.co/400x400/1C2039/FF3366?text=Imagen+No+Disponible";
-              setImgLoaded(true);
-            }}
-            loading="lazy"
-            className="w-full h-full object-contain p-8 group-hover:scale-110 transition-transform duration-1000 volumetric-glow"
             alt={titulo}
+            className="w-full h-full object-contain p-8 group-hover:scale-110 transition-transform duration-1000 volumetric-glow"
           />
         </AnimatePresence>
 

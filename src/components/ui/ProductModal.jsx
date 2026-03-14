@@ -9,6 +9,8 @@ import { formatPrice } from '../../utils/currency';
 import { useProducts } from '../../hooks/useProducts';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useCrossSelling } from '../../hooks/useCrossSelling';
+import { OptimizedImage } from './OptimizedImage';
+import { useDynamicSEO } from '../../hooks/useDynamicSEO';
 
 export function ProductModal() {
   const { activeProduct, setActiveProduct, currency } = useStore();
@@ -20,6 +22,12 @@ export function ProductModal() {
   // Hooks de lógica extraída
   useFocusTrap(modalRef, !!activeProduct);
   const crossSellItems = useCrossSelling(activeProduct, products);
+
+  // SEO Dinámico (Tarea 14)
+  useDynamicSEO({
+    title: activeProduct?.name,
+    description: activeProduct?.description || activeProduct?.category
+  });
 
   // Reset de imagen al abrir
   useEffect(() => {
@@ -66,7 +74,7 @@ export function ProductModal() {
                 {images.map((img, idx) => (
                   <button key={idx} onClick={() => setActiveImageIndex(idx)}
                     className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${activeImageIndex === idx ? 'border-quantum-cyan shadow-neon-sm scale-110' : 'border-white/10 opacity-50 hover:opacity-100'}`}>
-                    <img src={img} alt={`${activeProduct.name} ${idx}`} className="w-full h-full object-cover" />
+                    <OptimizedImage src={img} alt={`${activeProduct.name} ${idx}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -108,7 +116,7 @@ export function ProductModal() {
                   <div className="space-y-3">
                     {crossSellItems.map(item => (
                       <div key={item.id} className="flex items-center gap-4 p-3 rounded-xl bg-black/20 border border-white/5 hover:border-quantum-cyan/20 transition-all cursor-pointer group" onClick={() => setActiveProduct(item)}>
-                        <img src={item.images?.[0]} alt={item.name} className="w-12 h-12 object-contain bg-quantum-deep p-1 rounded-lg" />
+                        <OptimizedImage src={item.images?.[0]} alt={item.name} className="w-12 h-12 object-contain bg-quantum-deep p-1 rounded-lg" />
                         <div className="flex-1">
                           <h5 className="text-xs font-bold text-white group-hover:text-quantum-cyan transition-colors line-clamp-1">{item.name}</h5>
                           <span className="text-[10px] text-quantum-purple font-black">{formatPrice(item.price, currency)}</span>
