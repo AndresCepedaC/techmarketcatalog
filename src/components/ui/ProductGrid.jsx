@@ -11,12 +11,12 @@ import { ProductCard } from './ProductCard';
 import { ProductSkeleton } from './ProductSkeleton';
 import { CategoryFilters } from './CategoryFilters';
 
-const containerVariants = { 
+const containerVariants = {
   hidden: { opacity: 0 },
-  show: { 
-    opacity: 1, 
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 } 
-  } 
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+  }
 };
 
 export function ProductGrid() {
@@ -35,7 +35,7 @@ export function ProductGrid() {
     if (selectedCategory !== "Todos") list = list.filter(p => p?.category === selectedCategory);
     if (debouncedSearch.trim()) {
       const fuse = new Fuse(list, {
-        keys: ['titulo', 'name', 'categoria', 'category', 'specs.*'],
+        keys: ['name', 'category', 'specs.*'],
         threshold: 0.3,
         ignoreLocation: true
       });
@@ -50,8 +50,8 @@ export function ProductGrid() {
     return (
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-20 mt-12">
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10">
-          {[1,2,3,4,5,6].map(i => (
-             <ProductSkeleton key={i} />
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <ProductSkeleton key={i} />
           ))}
         </div>
       </div>
@@ -62,22 +62,22 @@ export function ProductGrid() {
     <section className="max-w-7xl mx-auto px-4 md:px-8 py-20 relative" id="catalog">
       {/* Micro-circuitry backdrop */}
       <div className="absolute inset-0 micro-circuitry opacity-[0.02] pointer-events-none" />
-      
+
       <CategoryFilters />
-      
+
       {/* 3D Perspective Container */}
       <div className="flex flex-col gap-40 perspective-deep">
         {categoriesToRender.length > 0 ? (
           categoriesToRender.map((cat, idx) => {
             // Alternate ambient gradients between categories for mini-world feel
             const isEven = idx % 2 === 0;
-            const bgGradient = isEven 
+            const bgGradient = isEven
               ? 'bg-gradient-to-br from-quantum-cyan/5 via-transparent to-quantum-purple/5'
               : 'bg-gradient-to-tr from-quantum-purple/5 via-transparent to-quantum-cyan/5';
 
             return (
               <div key={cat} className={`relative flex flex-col gap-16 p-8 md:p-12 rounded-[40px] border border-white/5 ${bgGradient} overflow-hidden group/cat transition-all duration-700 hover:border-quantum-cyan/20`}>
-                
+
                 {/* Immersive Category Background Blur */}
                 <div className="absolute inset-0 bg-quantum-deep/40 backdrop-blur-xl -z-10" />
                 <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-quantum-cyan/10 blur-[120px] rounded-full pointer-events-none -z-10 opacity-50 group-hover/cat:opacity-100 transition-opacity duration-1000" />
@@ -97,23 +97,23 @@ export function ProductGrid() {
                     </h2>
                   </div>
                   <div className="h-[2px] flex-1 bg-gradient-to-r from-quantum-cyan/40 via-quantum-purple/20 to-transparent mt-4 md:mb-4 relative overflow-hidden">
-                     <div className="absolute inset-0 w-1/3 h-full bg-white/40 blur-[2px] animate-data-stream" style={{ animationDuration: '3s' }} />
+                    <div className="absolute inset-0 w-1/3 h-full bg-white/40 blur-[2px] animate-data-stream" style={{ animationDuration: '3s' }} />
                   </div>
                 </div>
 
-              {/* Floating Products Grid */}
-              <motion.div 
-                variants={containerVariants} 
-                initial="hidden" 
-                whileInView="show" 
-                viewport={{ once: true, amount: 0.1 }}
-                className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10 preserve-3d"
-              >
-                {filtered.filter(p => p.category === cat).map((p, idx) => (
-                  <ProductCard key={p.id} product={p} index={idx} />
-                ))}
-              </motion.div>
-            </div>
+                {/* Floating Products Grid */}
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, amount: 0.1 }}
+                  className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-10 preserve-3d"
+                >
+                  {filtered.filter(p => p.category === cat).map((p, idx) => (
+                    <ProductCard key={p.id} product={p} index={idx} />
+                  ))}
+                </motion.div>
+              </div>
             );
           })
         ) : (

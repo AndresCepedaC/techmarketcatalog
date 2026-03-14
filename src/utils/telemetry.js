@@ -1,25 +1,61 @@
 /**
- * Telemetría Élite para TECHMARKET
- * Provee callbacks pre-integrados para sistemas analíticos como Google Tag Manager, 
- * Meta Pixel, Datadog o Segment en el futuro.
+ * Motor de Telemetría TechMarket — God Tier
+ * 
+ * Implementación segura estandarizada para Google Tag Manager (dataLayer).
+ * Diferencia entre desarrollo (logs) y producción (dataLayer.push).
  */
 
-export const trackSearch = (query) => {
-  if (!query || query.trim() === '') return;
-  console.log(`[TELEMETRÍA_QUANTUM] 📡 Interceptando búsqueda: "${query}"`);
-  // TODO: window.dataLayer.push({ event: 'search', search_term: query })
+const isDev = import.meta.env.DEV;
+
+// Asegurar existencia del dataLayer
+if (typeof window !== 'undefined' && !window.dataLayer) {
+  window.dataLayer = [];
+}
+
+/**
+ * Función interna para despachar eventos de forma segura.
+ */
+function pushEvent(event, data = {}) {
+  const payload = {
+    event,
+    timestamp: new Date().toISOString(),
+    ...data
+  };
+
+  if (isDev) {
+    console.group(`[Telemetry] ${event}`);
+    console.table(data);
+    console.groupEnd();
+  } else if (typeof window !== 'undefined') {
+    window.dataLayer.push(payload);
+  }
+}
+
+export const trackSearch = (query, resultCount) => {
+  pushEvent('search', {
+    search_term: query,
+    results_count: resultCount
+  });
 };
 
-export const trackCheckoutOpen = (productName, price) => {
-  console.log(`[TELEMETRÍA_QUANTUM] 💰 Intento de adquisición iniciado: ${productName} | Valor neto: $${price.toLocaleString('en-US')}`);
-  // TODO: window.dataLayer.push({ event: 'begin_checkout', value: price, items: [{ name: productName }] })
+export const trackCheckoutOpen = (cartTotal, itemsCount) => {
+  pushEvent('begin_checkout', {
+    value: cartTotal,
+    currency: 'COP',
+    item_count: itemsCount
+  });
 };
 
 export const trackProductView = (productName) => {
-  console.log(`[TELEMETRÍA_QUANTUM] 👀 Inspeccionando hardware: ${productName}`);
+  pushEvent('view_item', {
+    item_name: productName
+  });
 };
 
-export const trackCartCheckout = (cartTotal, totalItems) => {
-  console.log(`[TELEMETRÍA_QUANTUM] 🚀 Enviando orden global (Items: ${totalItems}) | Total: $${cartTotal.toLocaleString('en-US')}`);
-  // TODO: window.dataLayer.push({ event: 'purchase', value: cartTotal, items_length: totalItems })
+export const trackCartCheckout = (orderId, total) => {
+  pushEvent('purchase', {
+    transaction_id: orderId,
+    value: total,
+    currency: 'COP'
+  });
 };

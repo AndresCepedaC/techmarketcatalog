@@ -1,5 +1,7 @@
 // [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
-import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
+import { DEFAULT_CURRENCY, STORAGE_KEYS } from '../config/constants';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const StoreStateContext = createContext();
 const StoreDispatchContext = createContext();
@@ -7,14 +9,10 @@ const StoreDispatchContext = createContext();
 export function StoreProvider({ children }) {
   const [activeProduct, setActiveProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [currency, setCurrency] = useState('COP'); 
-  const [selectedCategory, setSelectedCategory] = useState(() => {
-    return localStorage.getItem('techmarket_category') || "Todos";
-  });
+  const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
 
-  useEffect(() => {
-    localStorage.setItem('techmarket_category', selectedCategory);
-  }, [selectedCategory]);
+  // Usar hook abstracto para la categoría seleccionada
+  const [selectedCategory, setSelectedCategory] = useLocalStorage(STORAGE_KEYS.CATEGORY, "Todos");
 
   const state = useMemo(() => ({
     activeProduct,
@@ -28,7 +26,7 @@ export function StoreProvider({ children }) {
     setSearchQuery,
     setSelectedCategory,
     setCurrency
-  }), []);
+  }), [setSelectedCategory]);
 
   return (
     <StoreStateContext.Provider value={state}>
@@ -55,7 +53,6 @@ export function useStoreDispatch() {
   return context;
 }
 
-// Retro-compatibilidad temporal (evita romper componentes no migrados si los hay)
 export function useStore() {
   const state = useStoreState();
   const dispatch = useStoreDispatch();

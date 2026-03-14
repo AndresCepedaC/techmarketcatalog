@@ -7,27 +7,27 @@ import { trackCartCheckout } from '../../utils/telemetry';
 import { formatPrice } from '../../utils/currency';
 
 export function CartDrawer() {
-  const { 
-    isCartOpen, 
-    setIsCartOpen, 
-    cartItems, 
-    cartTotal, 
-    totalItems, 
-    updateQuantity, 
+  const {
+    isCartOpen,
+    setIsCartOpen,
+    cartItems,
+    cartTotal,
+    totalItems,
+    updateQuantity,
     removeFromCart,
     clearCart
   } = useCart();
-  
+
   const { currency } = useStore();
 
   const handleCheckout = () => {
     if (cartItems.length === 0) return;
-    
+
     // Construir la orden
     let orderText = "Hola TECHMARKET, solicito la siguiente orden:\n";
     cartItems.forEach(item => {
-      const nombre = item.product.titulo || item.product.name;
-      const precioUnitario = item.product.precio || item.product.price;
+      const nombre = item.product.name;
+      const precioUnitario = item.product.price;
       const precioItem = precioUnitario * item.quantity;
       orderText += `- ${item.quantity}x ${nombre} (${formatPrice(precioItem, currency)})\n`;
     });
@@ -39,7 +39,7 @@ export function CartDrawer() {
     // Abrir WhatsApp
     const whatsappNum = import.meta.env.VITE_WHATSAPP_NUMBER || '573005054912';
     window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(orderText)}`, '_blank');
-    
+
     // Opcional: vaciar carrito despues de enviar al checkout?
     // clearCart();
   };
@@ -49,16 +49,16 @@ export function CartDrawer() {
       {isCartOpen && (
         <>
           {/* Overlay oscuro */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[101] bg-quantum-deep/80 backdrop-blur-sm"
             onClick={() => setIsCartOpen(false)}
           />
-          
+
           {/* Panel Lateral */}
-          <motion.div 
+          <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -77,7 +77,7 @@ export function CartDrawer() {
                 <Lucide.ShoppingBag className="text-quantum-cyan" size={24} />
                 <h2 className="text-xl font-black uppercase tracking-widest text-white text-glow-cyan">Nexo de Carga</h2>
               </div>
-              <button 
+              <button
                 onClick={() => setIsCartOpen(false)}
                 className="p-2 text-white/50 hover:text-quantum-cyan hover:bg-quantum-cyan/10 rounded-lg transition-colors"
               >
@@ -94,16 +94,16 @@ export function CartDrawer() {
                 </div>
               ) : (
                 cartItems.map(item => {
-                  const nombre = item.product.titulo || item.product.name;
-                  const foto = item.product.fotos?.[0] || item.product.foto || item.product.image;
-                  const precio = item.product.precio || item.product.price;
-                  
+                  const nombre = item.product.name;
+                  const foto = item.product.images?.[0];
+                  const precio = item.product.price;
+
                   return (
                     <div key={item.product.id} className="flex gap-4 p-4 rounded-xl bg-black/30 border border-white/5 relative group">
                       <div className="w-20 h-20 rounded-lg bg-quantum-deep flex items-center justify-center p-2 border border-white/5 flex-shrink-0">
                         <img src={foto} alt={nombre} className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(0,245,255,0.2)]" />
                       </div>
-                      
+
                       <div className="flex-1 flex flex-col justify-between">
                         <div className="pr-6">
                           <h4 className="text-sm font-bold text-white leading-tight line-clamp-2">{nombre}</h4>
@@ -111,17 +111,17 @@ export function CartDrawer() {
                             {formatPrice(precio, currency)}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center gap-4 mt-2">
                           <div className="flex items-center gap-2 bg-black/40 rounded-lg p-1 border border-white/10">
-                            <button 
+                            <button
                               onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                               className="w-6 h-6 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 rounded"
                             >
                               <Lucide.Minus size={12} />
                             </button>
                             <span className="text-xs font-mono font-bold w-4 text-center">{item.quantity}</span>
-                            <button 
+                            <button
                               onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                               className="w-6 h-6 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 rounded"
                             >
@@ -130,8 +130,8 @@ export function CartDrawer() {
                           </div>
                         </div>
                       </div>
-                      
-                      <button 
+
+                      <button
                         onClick={() => removeFromCart(item.product.id)}
                         className="absolute top-4 right-4 text-white/20 hover:text-danger-red transition-colors"
                       >
@@ -152,8 +152,8 @@ export function CartDrawer() {
                     {formatPrice(cartTotal, currency)}
                   </span>
                 </div>
-                
-                <button 
+
+                <button
                   onClick={handleCheckout}
                   className="neon-wave-btn w-full py-4 rounded-xl text-quantum-cyan font-black text-sm uppercase tracking-[0.2em] flex items-center justify-center gap-3"
                 >

@@ -4,11 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as Lucide from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { useProducts } from '../../hooks/useProducts';
+import { WHATSAPP_URL, STORAGE_KEYS } from '../../config/constants';
 
-const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY || '';
-const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const VALID_ROLES = new Set(['system', 'user', 'assistant']);
-const WHATSAPP_LINK = 'https://wa.me/573005054912';
 
 function sanitizeMessages(rawMessages) {
   return rawMessages.filter(m => {
@@ -20,17 +18,13 @@ function sanitizeMessages(rawMessages) {
   }).map(m => ({ role: m.role, content: String(m.content) }));
 }
 
-async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProduct) {
-  if (!GROQ_API_KEY) {
-    return { ok: false, text: "⚠️ Modo Demo: No hay API Key configurada." };
-  }
-
+async function fetchChatProxy(userMessage, chatHistory, productsContext, activeProduct) {
   try {
     const safeCatalog = (productsContext || []).map(p => ({
-      titulo: p.titulo,
-      precio: p.precio,
-      categoria: p.categoria,
-      descripcion: p.descripcion,
+      titulo: p.name, // Usar nombre normalizado
+      precio: p.price,
+      categoria: p.category,
+      descripcion: p.description,
       specs: p.specs
     }));
 
@@ -38,8 +32,8 @@ async function fetchGroqIA(userMessage, chatHistory, productsContext, activeProd
 Responde preguntas basándote ÚNICAMENTE en este catálogo de productos. 
 Si te preguntan por algo fuera del catálogo, di amablemente que no lo tenemos pero ofrece alternativas similares. 
 Estilo: Breve, profesional, usa negritas para nombres y precios.
-Contexto Actual: El cliente está viendo ${activeProduct ? activeProduct.titulo : "el catálogo general"}.
-Para compras/cierre: Invita a contactar por WhatsApp: ${WHATSAPP_LINK}.
+Contexto Actual: El cliente está viendo ${activeProduct ? activeProduct.name : "el catálogo general"}.
+Para compras/cierre: Invita a contactar por WhatsApp: ${WHATSAPP_URL}.
 Catálogo: ${JSON.stringify(safeCatalog)}`;
 
     const messages = sanitizeMessages([
@@ -51,24 +45,24 @@ Catálogo: ${JSON.stringify(safeCatalog)}`;
       { role: "user", content: String(userMessage) }
     ]);
 
-    console.log("Payload enviado a Groq:", { model: GROQ_MODEL, messages });
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const res = await fetch('/api/chat', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ model: GROQ_MODEL, messages, temperature: 0.7, max_tokens: 512 })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages, activeProduct })
     });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP ${res.status}`);
+    }
+
     const data = await res.json();
-    return { ok: true, text: data.choices?.[0]?.message?.content || "No pude generar respuesta." };
+    return { ok: true, text: data.reply || "No pude generar respuesta." };
   } catch (error) {
-    console.error("🔥 Error detallado en fetchGroqIA:", error);
+    console.error("🔥 Error en fetchChatProxy:", error);
     return {
       ok: false,
-      text: `Fallo interno del sistema: ${error.message}. Revisa la consola del navegador para más detalles.`
+      text: `Fallo interno del sistema: ${error.message}. Intenta de nuevo o contáctanos por WhatsApp.`
     };
   }
 }
@@ -84,7 +78,7 @@ export function Chatbot() {
   const endRef = useRef(null);
 
   useEffect(() => {
-    const hasBeenOpened = sessionStorage.getItem('aura_opened');
+    const hasBeenOpened = sessionStorage.getItem(STORAGE_KEYS.CHAT_OPEN);
     if (!hasBeenOpened) {
       const timer = setTimeout(() => setShowInvite(true), 5000);
       return () => clearTimeout(timer);
@@ -98,7 +92,7 @@ export function Chatbot() {
   const toggleChat = () => {
     setIsOpen(!isOpen);
     setShowInvite(false);
-    sessionStorage.setItem('aura_opened', 'true');
+    sessionStorage.setItem(STORAGE_KEYS.CHAT_OPEN, 'true');
   };
 
   const handleSend = async () => {
@@ -108,7 +102,7 @@ export function Chatbot() {
     setInput('');
     setTyping(true);
 
-    const result = await fetchGroqIA(userTxt, msgs, products, activeProduct);
+    const result = await fetchChatProxy(userTxt, msgs, products, activeProduct);
     setMsgs(prev => [...prev, { r: result.ok ? 'bot' : 'error', t: result.text }]);
     setTyping(false);
   };
@@ -197,7 +191,7 @@ export function Chatbot() {
                     }`}>
                     {m.t}
                     {m.r === 'error' && (
-                      <a href={WHATSAPP_LINK} target="_blank" className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase text-white bg-green-500/20 border border-green-500/40 px-3 py-2.5 rounded-xl justify-center transition-all hover:bg-green-500/30">
+                      <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase text-white bg-green-500/20 border border-green-500/40 px-3 py-2.5 rounded-xl justify-center transition-all hover:bg-green-500/30">
                         <Lucide.MessageCircle size={14} /> Canal de WhatsApp
                       </a>
                     )}

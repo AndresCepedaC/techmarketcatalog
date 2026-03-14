@@ -9,19 +9,19 @@ import { formatPrice } from '../../utils/currency';
 
 const LEVITATE_CLASSES = ['animate-levitate-slow', 'animate-levitate-med', 'animate-levitate-fast'];
 
-const itemVariants = { 
-  hidden: { opacity: 0, y: 40, scale: 0.96 }, 
-  show: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 70, damping: 15, mass: 0.8 } } 
+const itemVariants = {
+  hidden: { opacity: 0, y: 40, scale: 0.96 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 70, damping: 15, mass: 0.8 } }
 };
 
-const ProductCardComponent = function({ product, index }) {
+const ProductCardComponent = function ({ product, index }) {
   const { setActiveProduct, currency } = useStore();
   const { addToCart } = useCart();
   const [currentImg, setCurrentImg] = useState(0);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const cardRef = useRef(null);
-  
+
   // Detect mobile on mount for JS-driven animations
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth < 768);
@@ -29,22 +29,21 @@ const ProductCardComponent = function({ product, index }) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-  
+
   // 3D Tilt Effect Values
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotateX = useTransform(y, [-100, 100], [4, -4]);
   const rotateY = useTransform(x, [-100, 100], [-4, 4]);
-  
-  // Data Model Unification
-  const titulo = product?.titulo || product?.name || 'Tech';
-  const precio = product?.precio || product?.price || 0;
-  const stock = typeof product?.stock === 'number' ? product.stock : 10; // Provide fake default if no stock data
-  const rawFoto = product?.foto || product?.fotos;
-  const fotos = Array.isArray(rawFoto) ? rawFoto : (typeof rawFoto === 'string' ? [rawFoto] : [`https://placehold.co/400x400/1C2039/00E5FF?text=${encodeURIComponent(titulo)}`]);
+
+  // Normalized product model (from useProducts)
+  const titulo = product?.name || 'Tech';
+  const precio = product?.price || 0;
+  const stock = product?.stock ?? 10;
+  const fotos = product?.images?.length ? product.images : [`https://placehold.co/400x400/1C2039/00E5FF?text=${encodeURIComponent(titulo)}`];
 
   const levitateClass = LEVITATE_CLASSES[index % 3];
-  
+
   const handleMouseMove = (event) => {
     if (isMobile || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
@@ -57,27 +56,27 @@ const ProductCardComponent = function({ product, index }) {
     x.set(0);
     y.set(0);
   };
-  
+
   const handleNextImg = (e) => { e.stopPropagation(); setCurrentImg((prev) => (prev + 1) % fotos.length); };
   const handlePrevImg = (e) => { e.stopPropagation(); setCurrentImg((prev) => (prev - 1 + fotos.length) % fotos.length); };
-  
+
   const handleComprar = (e) => {
     e.stopPropagation();
     addToCart(product);
   };
 
   return (
-    <motion.div 
+    <motion.div
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      variants={itemVariants} 
+      variants={itemVariants}
       className={`group relative floating-island overflow-visible cursor-pointer flex flex-col h-full ${levitateClass}`}
       onClick={() => {
-        trackProductView(product.name || product.titulo);
+        trackProductView(product.name);
         setActiveProduct(product);
       }}
-      style={{ 
+      style={{
         animationDelay: `${index * 0.3}s`,
         rotateX: isMobile ? 0 : rotateX,
         rotateY: isMobile ? 0 : rotateY,
@@ -88,13 +87,13 @@ const ProductCardComponent = function({ product, index }) {
     >
       {/* Volumetric top light */}
       <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-quantum-cyan/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none rounded-t-3xl" />
-      
+
       {/* Ambient glow on hover */}
       <div className="absolute -inset-2 bg-quantum-cyan/5 md:blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none rounded-3xl" />
-      
+
       {/* Floating micro-particles inside card */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden hidden md:block">
-        {[0,1,2].map(i => (
+        {[0, 1, 2].map(i => (
           <div key={i} className="absolute rounded-full bg-quantum-cyan/30 animate-float" style={{
             width: 2 + i, height: 2 + i,
             left: `${20 + i * 30}%`, top: `${30 + i * 20}%`,
@@ -128,20 +127,20 @@ const ProductCardComponent = function({ product, index }) {
           {!imgLoaded && (
             <div className="absolute inset-0 shimmer" />
           )}
-          <motion.img 
-            key={currentImg} 
+          <motion.img
+            key={currentImg}
             layoutId={`product-image-${product.id}`}
             initial={{ opacity: 0, scale: 0.9, filter: isMobile ? 'none' : 'blur(10px)' }}
             animate={{ opacity: imgLoaded ? 1 : 0, scale: 1, filter: 'blur(0px)' }}
             transition={{ duration: 0.6 }}
-            src={fotos[currentImg]} 
+            src={fotos[currentImg]}
             onLoad={() => setImgLoaded(true)}
             onError={(e) => {
               e.target.src = "https://placehold.co/400x400/1C2039/FF3366?text=Imagen+No+Disponible";
               setImgLoaded(true);
             }}
             loading="lazy"
-            className="w-full h-full object-contain p-8 group-hover:scale-110 transition-transform duration-1000 volumetric-glow" 
+            className="w-full h-full object-contain p-8 group-hover:scale-110 transition-transform duration-1000 volumetric-glow"
             alt={titulo}
           />
         </AnimatePresence>
@@ -158,17 +157,17 @@ const ProductCardComponent = function({ product, index }) {
         <h3 className="font-black text-lg md:text-xl text-white mb-2 line-clamp-2 tracking-tight transition-all group-hover:text-quantum-cyan text-glow-cyan leading-snug">
           {titulo}
         </h3>
-        
+
         {/* Holographic spec readout */}
         <div className="flex-1">
           <div className="holo-data text-[11px] mb-6 line-clamp-2 leading-relaxed tracking-widest uppercase text-quantum-cyan/60">
             {product?.specs ? Object.values(product.specs).join(" // ") : 'SPEC_NULL'}
           </div>
         </div>
-        
+
         {/* Conversion Block (Gestalt Grouping) */}
         <div className="mt-4 p-5 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-5 relative">
-          
+
           {/* FOMO Scarcity Trigger */}
           {stock <= 5 && (
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 px-3 py-1 bg-danger-red/20 backdrop-blur-md rounded-full border border-danger-red/40 shadow-[0_0_15px_rgba(255,42,95,0.4)] mx-auto z-20 animate-pulse w-max">
@@ -187,9 +186,9 @@ const ProductCardComponent = function({ product, index }) {
               {formatPrice(precio, currency)}
             </span>
           </div>
-          
-          <button 
-            onClick={handleComprar} 
+
+          <button
+            onClick={handleComprar}
             className={`neon-wave-btn w-full h-12 rounded-xl font-black text-[12px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 text-quantum-cyan hover:bg-quantum-cyan/10 transition-colors`}
           >
             <Lucide.ShoppingBag size={14} /> ADQUIRIR AL NEXO
