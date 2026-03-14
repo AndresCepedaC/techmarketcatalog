@@ -81,7 +81,7 @@ const ProductCardComponent = function ({ product, index }) {
         rotateX: isMobile ? 0 : rotateX,
         rotateY: isMobile ? 0 : rotateY,
         transformStyle: isMobile ? 'flat' : 'preserve-3d',
-        perspective: isMobile ? '1000px',
+        perspective: isMobile ? 'none' : '1000px',
         willChange: isMobile ? 'auto' : 'transform'
       }}
     >

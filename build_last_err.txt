@@ -1,0 +1,100 @@
+uild] [plugin 
+vite-plugin-pwa:build] 
+src/components/ui/Produ
+ctCard.jsx (84:40): 
+There was an error 
+during the build:
+  Transform failed 
+with 1 error:
+C:/Users/andre/OneDrive
+/Documentos/Marca/techm
+arketcatalog/src/compon
+ents/ui/ProductCard.jsx
+:84:40: ERROR: 
+Expected ":" but found 
+","
+Additionally, handling 
+the error in the 
+'buildEnd' hook caused 
+the following error:
+  Transform failed 
+with 1 error:
+C:/Users/andre/OneDrive
+/Documentos/Marca/techm
+arketcatalog/src/compon
+ents/ui/ProductCard.jsx
+:84:40: ERROR: 
+Expected ":" but found 
+","[31m
+file: [36mC:/Users/and
+re/OneDrive/Documentos/
+Marca/techmarketcatalog
+/src/components/ui/Prod
+uctCard.jsx:84:40[31m
+[33m
+[33mExpected ":" but 
+found ","[33m
+82 |          rotateY: 
+isMobile ? 0 : rotateY,
+83 |          
+transformStyle: 
+isMobile ? 'flat' : 
+'preserve-3d',
+84 |          
+perspective: isMobile 
+? '1000px',
+   |                   
+                       
+^
+85 |          
+willChange: isMobile ? 
+'auto' : 'transform'
+86 |        }}
+[31m
+    at getRollupError (
+file:///C:/Users/andre/
+OneDrive/Documentos/Mar
+ca/techmarketcatalog/no
+de_modules/rollup/dist/
+es/shared/parseAst.js:4
+02:41)
+    at file:///C:/Users
+/andre/OneDrive/Documen
+tos/Marca/techmarketcat
+alog/node_modules/rollu
+p/dist/es/shared/node-e
+ntry.js:23467:39
+    at process.processT
+icksAndRejections (node
+:internal/process/task_
+queues:104:5)
+    at async catchUnfin
+ishedHookActions (file:
+///C:/Users/andre/OneDr
+ive/Documentos/Marca/te
+chmarketcatalog/node_mo
+dules/rollup/dist/es/sh
+ared/node-entry.js:2292
+5:16)
+    at async 
+rollupInternal (file://
+/C:/Users/andre/OneDriv
+e/Documentos/Marca/tech
+marketcatalog/node_modu
+les/rollup/dist/es/shar
+ed/node-entry.js:23450:
+5)
+    at async build (fil
+e:///C:/Users/andre/One
+Drive/Documentos/Marca/
+techmarketcatalog/node_
+modules/vite/dist/node/
+chunks/dep-BK3b2jBa.js:
+65709:14)
+    at async 
+CAC.<anonymous> (file:/
+//C:/Users/andre/OneDri
+ve/Documentos/Marca/tec
+hmarketcatalog/node_mod
+ules/vite/dist/node/cli
+.js:829:5)[39m
