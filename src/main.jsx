@@ -9,7 +9,6 @@ import { CartProvider } from './context/CartContext';
 // Components (Eager Loading - Críticos para el primer render)
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { OfflineBanner } from './hooks/useNetwork';
-import { TopBar } from './components/layout/TopBar';
 import { Header } from './components/layout/Header';
 import { Hero } from './components/layout/Hero';
 import { ProductGrid } from './components/ui/ProductGrid';
@@ -69,7 +68,7 @@ function App() {
           <SocialProofToast />
           <ReloadPrompt />
 
-          <TopBar />
+          {/* Header maestro que ya contiene al TopBar */}
           <Header />
 
           <main>

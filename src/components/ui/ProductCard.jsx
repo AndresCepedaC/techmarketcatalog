@@ -111,7 +111,7 @@ const ProductCardComponent = function ({ product, index }) {
       )}
 
       {/* Product Image Area */}
-      <div className="relative aspect-square bg-quantum-deep/40 border-b border-white/5 overflow-hidden flex items-center justify-center rounded-t-3xl" style={{ transform: isMobile ? 'none' : 'translateZ(20px)' }}>
+      <div className="relative aspect-square bg-quantum-deep/40 border-b border-white/5 overflow-hidden flex items-center justify-center rounded-t-3xl flex-shrink-0" style={{ transform: isMobile ? 'none' : 'translateZ(20px)' }}>
         {fotos.length > 1 && (
           <>
             <button onClick={handlePrevImg} aria-label="Imagen anterior" className="absolute left-3 z-30 p-2.5 glass-quantum text-quantum-cyan rounded-xl opacity-0 hover:bg-quantum-cyan hover:text-quantum-deep group-hover:opacity-100 transition-all shadow-neon-sm">
@@ -134,52 +134,52 @@ const ProductCardComponent = function ({ product, index }) {
         </AnimatePresence>
 
         {/* Category as holographic data band */}
-        <div className="absolute top-4 left-4 z-20 holo-data px-3 py-1.5 text-[8px] uppercase font-black tracking-[0.4em] bg-quantum-deep/70 backdrop-blur-md rounded-lg border border-quantum-cyan/15">
+        <div className="absolute top-4 left-4 z-20 holo-data px-3 py-1.5 text-[8px] uppercase font-black tracking-[0.4em] bg-quantum-deep/70 backdrop-blur-md rounded-lg border border-quantum-cyan/15 truncate max-w-[60%]">
           {product?.category}
         </div>
       </div>
 
       {/* Data Section */}
-      <div className="p-6 md:p-8 flex flex-col flex-1 relative z-10 bg-quantum-deep/80 md:bg-quantum-deep/40 rounded-b-[24px] md:backdrop-blur-md" style={{ transform: isMobile ? 'none' : 'translateZ(30px)' }}>
+      <div className="p-6 md:p-8 flex flex-col flex-1 relative z-10 bg-quantum-deep/80 md:bg-quantum-deep/40 rounded-b-[24px] md:backdrop-blur-md min-w-0" style={{ transform: isMobile ? 'none' : 'translateZ(30px)' }}>
         {/* Product Name */}
-        <h3 className="font-black text-lg md:text-xl text-white mb-2 line-clamp-2 tracking-tight transition-all group-hover:text-quantum-cyan text-glow-cyan leading-snug">
+        <h3 className="font-black text-lg sm:text-xl text-white mb-2 line-clamp-2 tracking-tight transition-all group-hover:text-quantum-cyan text-glow-cyan leading-snug break-words" title={titulo}>
           {titulo}
         </h3>
 
         {/* Holographic spec readout */}
-        <div className="flex-1">
-          <div className="holo-data text-[11px] mb-6 line-clamp-2 leading-relaxed tracking-widest uppercase text-quantum-cyan/60">
+        <div className="flex-1 min-w-0">
+          <div className="holo-data text-[11px] mb-6 line-clamp-2 leading-relaxed tracking-widest uppercase text-quantum-cyan/60 break-words">
             {product?.specs ? Object.values(product.specs).join(" // ") : 'SPEC_NULL'}
           </div>
         </div>
 
         {/* Conversion Block (Gestalt Grouping) */}
-        <div className="mt-4 p-5 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-5 relative">
+        <div className="mt-4 p-5 rounded-2xl bg-black/20 border border-white/5 flex flex-col gap-5 relative min-w-0">
 
           {/* FOMO Scarcity Trigger */}
           {stock <= 5 && (
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 px-3 py-1 bg-danger-red/20 backdrop-blur-md rounded-full border border-danger-red/40 shadow-[0_0_15px_rgba(255,42,95,0.4)] mx-auto z-20 animate-pulse w-max">
-              <Lucide.AlertCircle size={10} className="text-danger-red" />
-              <span className="text-[9px] uppercase font-black tracking-[0.3em] text-danger-red">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1.5 px-3 py-1 bg-danger-red/20 backdrop-blur-md rounded-full border border-danger-red/40 shadow-[0_0_15px_rgba(255,42,95,0.4)] mx-auto z-20 animate-pulse w-max max-w-[90%]">
+              <Lucide.AlertCircle size={10} className="text-danger-red flex-shrink-0" />
+              <span className="text-[9px] uppercase font-black tracking-[0.3em] text-danger-red truncate">
                 Últimas {stock} unidades
               </span>
             </div>
           )}
 
-          <div className="flex justify-between items-end">
-            <span className="text-[9px] uppercase text-white/40 font-black tracking-[0.4em] mb-1 flex items-center gap-2">
-              <Lucide.Tag size={10} className="text-quantum-cyan" /> NET VALUE
+          <div className="flex justify-between items-end gap-2 overflow-hidden">
+            <span className="text-[9px] uppercase text-white/40 font-black tracking-[0.4em] mb-1 flex items-center gap-2 flex-shrink-0">
+              <Lucide.Tag size={10} className="text-quantum-cyan" /> NET
             </span>
-            <span className="text-3xl font-black text-white group-hover:text-quantum-purple transition-all text-glow-purple drop-shadow-[0_0_15px_rgba(157,0,255,0.4)]">
+            <span className="text-2xl sm:text-3xl font-black text-white group-hover:text-quantum-purple transition-all text-glow-purple drop-shadow-[0_0_15px_rgba(157,0,255,0.4)] whitespace-nowrap truncate">
               {formatPrice(precio, currency)}
             </span>
           </div>
 
           <button
             onClick={handleComprar}
-            className={`neon-wave-btn w-full h-12 rounded-xl font-black text-[12px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 text-quantum-cyan hover:bg-quantum-cyan/10 transition-colors`}
+            className={`neon-wave-btn w-full h-12 rounded-xl font-black text-[12px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 text-quantum-cyan hover:bg-quantum-cyan/10 transition-colors overflow-hidden px-2`}
           >
-            <Lucide.ShoppingBag size={14} /> ADQUIRIR AL NEXO
+            <Lucide.ShoppingBag size={14} className="flex-shrink-0" /> <span className="truncate">ADQUIRIR</span>
           </button>
         </div>
       </div>
@@ -191,5 +191,5 @@ const ProductCardComponent = function ({ product, index }) {
 };
 
 export const ProductCard = React.memo(ProductCardComponent, (prevProps, nextProps) => {
-  return prevProps.product?.id === nextProps.product?.id;
+  return prevProps.product?.id === nextProps.product?.id && prevProps.product?.name === nextProps.product?.name;
 });

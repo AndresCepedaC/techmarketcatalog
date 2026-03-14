@@ -39,9 +39,6 @@ export function CartDrawer() {
     // Abrir WhatsApp
     const whatsappNum = import.meta.env.VITE_WHATSAPP_NUMBER || '573005054912';
     window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(orderText)}`, '_blank');
-
-    // Opcional: vaciar carrito despues de enviar al checkout?
-    // clearCart();
   };
 
   return (
@@ -72,7 +69,7 @@ export function CartDrawer() {
             className="fixed top-0 right-0 bottom-0 z-[102] w-full max-w-md bg-quantum-deep/90 backdrop-blur-xl border-l border-quantum-cyan/20 shadow-[-10px_0_40px_rgba(0,245,255,0.1)] flex flex-col"
           >
             {/* Header */}
-            <div className="p-6 border-b border-white/5 flex items-center justify-between">
+            <div className="p-6 border-b border-white/5 flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-3">
                 <Lucide.ShoppingBag className="text-quantum-cyan" size={24} />
                 <h2 className="text-xl font-black uppercase tracking-widest text-white text-glow-cyan">Nexo de Carga</h2>
@@ -80,6 +77,7 @@ export function CartDrawer() {
               <button
                 onClick={() => setIsCartOpen(false)}
                 className="p-2 text-white/50 hover:text-quantum-cyan hover:bg-quantum-cyan/10 rounded-lg transition-colors"
+                aria-label="Cerrar carrito"
               >
                 <Lucide.X size={24} />
               </button>
@@ -104,16 +102,16 @@ export function CartDrawer() {
                         <img src={foto} alt={nombre} className="w-full h-full object-contain drop-shadow-[0_0_8px_rgba(0,245,255,0.2)]" />
                       </div>
 
-                      <div className="flex-1 flex flex-col justify-between">
-                        <div className="pr-6">
-                          <h4 className="text-sm font-bold text-white leading-tight line-clamp-2">{nombre}</h4>
-                          <span className="text-xs text-quantum-cyan font-black mt-1 inline-block drop-shadow-[0_0_8px_rgba(0,245,255,0.4)]">
+                      <div className="flex-1 flex flex-col justify-between min-w-0">
+                        <div className="pr-8">
+                          <h4 className="text-sm font-bold text-white leading-tight line-clamp-2 break-words" title={nombre}>{nombre}</h4>
+                          <span className="text-xs text-quantum-cyan font-black mt-1 inline-block drop-shadow-[0_0_8px_rgba(0,245,255,0.4)] whitespace-nowrap">
                             {formatPrice(precio, currency)}
                           </span>
                         </div>
 
                         <div className="flex items-center gap-4 mt-2">
-                          <div className="flex items-center gap-2 bg-black/40 rounded-lg p-1 border border-white/10">
+                          <div className="flex items-center gap-2 bg-black/40 rounded-lg p-1 border border-white/10 flex-shrink-0">
                             <button
                               onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                               className="w-6 h-6 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 rounded"
@@ -133,7 +131,8 @@ export function CartDrawer() {
 
                       <button
                         onClick={() => removeFromCart(item.product.id)}
-                        className="absolute top-4 right-4 text-white/20 hover:text-danger-red transition-colors"
+                        className="absolute top-4 right-4 text-white/20 hover:text-danger-red transition-colors p-1"
+                        aria-label="Eliminar producto"
                       >
                         <Lucide.Trash2 size={16} />
                       </button>
@@ -145,19 +144,19 @@ export function CartDrawer() {
 
             {/* Footer / Checkout */}
             {cartItems.length > 0 && (
-              <div className="p-6 border-t border-white/5 bg-black/20">
-                <div className="flex justify-between items-center mb-6">
-                  <span className="text-xs font-black uppercase text-white/50 tracking-widest">Valor Neto ({currency})</span>
-                  <span className="text-3xl font-black text-white text-glow-cyan drop-shadow-[0_0_15px_rgba(0,245,255,0.4)]">
+              <div className="p-6 border-t border-white/5 bg-black/20 flex-shrink-0">
+                <div className="flex justify-between items-center gap-4 mb-6">
+                  <span className="text-[10px] font-black uppercase text-white/50 tracking-widest flex-shrink-0">Valor Neto ({currency})</span>
+                  <span className="text-2xl sm:text-3xl font-black text-white text-glow-cyan drop-shadow-[0_0_15px_rgba(0,245,255,0.4)] whitespace-nowrap overflow-hidden text-ellipsis">
                     {formatPrice(cartTotal, currency)}
                   </span>
                 </div>
 
                 <button
                   onClick={handleCheckout}
-                  className="neon-wave-btn w-full py-4 rounded-xl text-quantum-cyan font-black text-sm uppercase tracking-[0.2em] flex items-center justify-center gap-3"
+                  className="neon-wave-btn w-full py-4 rounded-xl text-quantum-cyan font-black text-sm uppercase tracking-[0.2em] flex items-center justify-center gap-3 overflow-hidden"
                 >
-                  <Lucide.Zap size={18} className="fill-current" /> PROCESAR ORDEN GLOBAL
+                  <Lucide.Zap size={18} className="fill-current flex-shrink-0" /> <span className="truncate">PROCESAR ORDEN GLOBAL</span>
                 </button>
               </div>
             )}
