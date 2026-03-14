@@ -1,12 +1,12 @@
 // [Brand-adapted] — tokens from design-system.json | visual ref: photos/background/ + photos/logo/
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 
 import { StoreProvider, useStore } from './context/StoreContext';
 import { CartProvider } from './context/CartContext';
 
-// Components
+// Components (Eager Loading - Críticos para el primer render)
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { OfflineBanner } from './hooks/useNetwork';
 import { TopBar } from './components/layout/TopBar';
@@ -14,23 +14,26 @@ import { Header } from './components/layout/Header';
 import { Hero } from './components/layout/Hero';
 import { ProductGrid } from './components/ui/ProductGrid';
 import { useProducts } from './hooks/useProducts';
-import { ProductModal } from './components/ui/ProductModal';
-import { CartDrawer } from './components/ui/CartDrawer';
 import { Toast } from './components/ui/Toast';
 import { SocialProofToast } from './hooks/useSocialProof';
-import { Chatbot } from './components/features/Chatbot';
 import { TrustSection } from './components/features/TrustSection';
 import { Footer } from './components/layout/Footer';
 import { ParticleField } from './components/ui/ParticleField';
+import { ReloadPrompt } from './components/ui/ReloadPrompt';
+
+// Components (Lazy Loading - Pesados o secundarios)
+const ProductModal = lazy(() => import('./components/ui/ProductModal').then(module => ({ default: module.ProductModal })));
+const CartDrawer = lazy(() => import('./components/ui/CartDrawer').then(module => ({ default: module.CartDrawer })));
+const Chatbot = lazy(() => import('./components/features/Chatbot').then(module => ({ default: module.Chatbot })));
 
 function DeepLinkHandler() {
   const { setActiveProduct } = useStore();
   const { data: products } = useProducts();
-  
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const productId = params.get('product');
-    
+
     if (productId && products && products.length > 0) {
       const foundProduct = products.find(p => p.id.toString() === productId);
       if (foundProduct) {
@@ -38,7 +41,7 @@ function DeepLinkHandler() {
       }
     }
   }, [setActiveProduct, products]);
-  
+
   return null;
 }
 
@@ -64,22 +67,26 @@ function App() {
           <ParticleField />
           <Toast />
           <SocialProofToast />
-          
+          <ReloadPrompt />
+
           <TopBar />
           <Header />
-          
+
           <main>
             <Hero />
             <TrustSection />
             <div id="grid-start" className="scroll-mt-32" />
             <ProductGrid />
           </main>
-          
+
           <Footer />
 
-          <ProductModal />
-          <CartDrawer />
-          <Chatbot />
+          {/* Carga diferida de componentes pesados con Suspense */}
+          <Suspense fallback={null}>
+            <ProductModal />
+            <CartDrawer />
+            <Chatbot />
+          </Suspense>
         </div>
       </CartProvider>
     </StoreProvider>
